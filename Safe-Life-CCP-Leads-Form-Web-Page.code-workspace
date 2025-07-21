@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../CCP Leads form/node_modules"
+		},
+		{
+			"path": "../CCP Leads form/netlify"
+		}
+	],
+	"settings": {}
+}
