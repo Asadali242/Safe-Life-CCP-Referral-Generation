@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeLife Lead Capture</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="script.js"></script>
+</head>
+<body>
+  <header class="page-header">
+    <img src="icon.png" alt="SafeLife Logo" class="logo">
+  </header>  
+  <div class="container">
+    <!-- Progress Bar -->
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <p id="stepIndicator" class="step-indicator">Step 1 of 6</p>
+
+    <!-- Form -->
+    <h2>Safe Life Home Care Information Form</h2>
+    <form id="leadForm">
+      <!-- Step 1 -->
+      <div class="step active">
+        <label>Your Name</label>
+        <input type="text" name="name" required>
+        <button type="button" onclick="nextStep()">Next</button>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step">
+        <label>Your Relation with the Client</label>
+        <input type="text" name="relation" required>
+        <button type="button" onclick="nextStep()">Next</button>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step">
+        <label>Does the Client have Medicaid?</label>
+        <select name="medicaid" id="medicaid" onchange="toggleMedicaidField()" required>
+          <option value="">Select</option>
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
+
+        <!-- Conditional field -->
+        <div id="medicaidNumberContainer" style="display:none; margin-top:20px;">
+          <label>Medicaid Number (if known)</label>
+          <input type="text" name="medicaid_number">
+        </div>
+        <button type="button" onclick="nextStep()">Next</button>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="step">
+        <label>Phone</label>
+        <input type="tel" name="phone" required>
+        <label>Email</label>
+        <input type="email" name="email" required>
+        <button type="button" onclick="nextStep()">Next</button>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="step">
+        <label>Any other related info</label>
+        <textarea name="info" rows="4"></textarea>
+        <button type="submit">Submit</button>
+      </div>
+
+      <!-- Step 6 -->
+      <div class="step" id="thankYouStep">
+        <h3>Your responses have been recorded. Thank you!</h3>
+      </div>
+    </form>
+  </div>
+  <div class="quote-container">
+    <span id="typingQuote"></span>
+  </div>
+  <footer class="footer">
+    <p>Safe Life Home Health Care</p>
+    <p>101 W 22<sup>nd</sup> St, STE 202, Lombard IL-60148</p>
+    <p>Ph: (855) 723 3440 &nbsp; | &nbsp; Fax: (630) 406 8342</p>
+  </footer>    
+</body>
+</html>
