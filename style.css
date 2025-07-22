@@ -11,9 +11,10 @@ html, body {
 body {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   align-items: center;
   background: linear-gradient(135deg, #004a68, #3cafaa);
+  margin: 0;
+  padding: 0;
   min-height: 100vh;
   font-family: 'Montserrat', sans-serif;
 }
@@ -31,35 +32,41 @@ body {
   width: auto;
 }
 
-/* Form Container */
-.container {
-  background: #ffffff;
-  padding: 30px;
-  border-radius: 12px;
-  box-sizing: border-box;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  width: 450px; /* Fixed width on desktop */
-  text-align: center;
-  margin: auto;
-  margin-top: 100px; /* space under the header */
-  margin-bottom: 80px; /* space above footer */
-  position: relative;
-  z-index: 1;
-}
-
 /* Quote - Desktop */
 .quote-container {
   position: absolute;
-  right: 60px;
+  right: 50px;
   top: 50%;
   transform: translateY(-50%);
-  text-align: left;
-  color: #fff;
-  font-size: 1.4rem;
+  font-size: 1.5rem;
+  color: #ffffff;
+  font-family: 'Montserrat', sans-serif;
   font-weight: 600;
-  max-width: 250px;
-  line-height: 1.4;
-  z-index: 2;
+  width: 300px;       /* Keeps it within a fixed width */
+  text-align: left;
+  white-space: normal; /* Allow wrapping */
+  word-wrap: break-word;
+}
+
+/* Form Container */
+.container {
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 12px;
+  box-sizing: border-box;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  width: 550px; /* Slightly wider */
+  text-align: center;
+  margin: auto;
+  position: relative;
+  top: 50%;
+  transform: translateY(20%);
+  z-index: 1;
+}
+
+main.container {
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
 /* Footer */
@@ -152,11 +159,11 @@ label {
 /* Inputs, selects, and textareas */
 input, select, textarea {
   width: 100%;
-  padding: 14px 16px;
-  font-size: 1.1rem;
+  padding: 16px 18px;
+  font-size: 1.2rem;
   border-radius: 8px;
   border: 1px solid #ccc;
-  background: #DFF8FF;   /* Blue Extra Light */
+  background: #DFF8FF;
   margin-top: 10px;
   margin-bottom: 20px;
   box-sizing: border-box;
@@ -239,24 +246,45 @@ button.back-btn:hover {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
+/* Mobile & Tablet Styles */
+@media (max-width: 1024px) {
+  body {
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  .page-header {
+    position: relative;
+    top: 10px;
+    left: 0;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
   .page-header .logo {
     height: 100px;
   }
 
   .quote-container {
     position: relative;
-    transform: none;
     text-align: center;
-    max-width: 95%;
-    margin: 20px auto;
-    font-size: 1.2rem;
+    transform: none;
+    margin: 10px auto 20px;
+    font-size: 1.3rem;
+    width: 90%;
   }
 
   .container {
-    width: 95%;
-    max-width: 95%;
-    margin-top: 20px;
+    width: 90%;
+    max-width: 90%;
+    margin: 0 auto 20px;
+  }
+
+  .footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.1);
   }
 }

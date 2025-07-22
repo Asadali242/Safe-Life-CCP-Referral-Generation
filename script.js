@@ -196,7 +196,7 @@ document.getElementById('leadForm').addEventListener('submit', async function(e)
 });
 
 // Typing animation for quote
-const quoteText = "Keeping You Home, Keeping You Safe !";
+const quoteText = "Keeping You Home, Keeping You Safe!";
 let quoteIndex = 0;
 let isDeleting = false;
 
@@ -208,17 +208,18 @@ function typeQuote() {
     quoteIndex++;
     if (quoteIndex === quoteText.length) {
       isDeleting = true;
-      setTimeout(typeQuote, 1500); // Pause before deleting
+      setTimeout(typeQuote, 1500); // Pause after full text
       return;
     }
   } else {
     typingElement.textContent = quoteText.substring(0, quoteIndex - 1);
     quoteIndex--;
     if (quoteIndex === 0) {
-      isDeleting = false;
+      isDeleting = false; // Start typing again
     }
   }
-  setTimeout(typeQuote, isDeleting ? 50 : 100); // Typing speed
+
+  setTimeout(typeQuote, isDeleting ? 50 : 100); // Adjust typing/deleting speed
 }
 
 document.addEventListener('DOMContentLoaded', typeQuote);
