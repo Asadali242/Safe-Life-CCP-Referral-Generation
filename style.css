@@ -38,14 +38,17 @@ body {
   right: 50px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   color: #ffffff;
   font-family: 'Montserrat', sans-serif;
   font-weight: 600;
-  width: 300px;       /* Keeps it within a fixed width */
-  text-align: left;
-  white-space: normal; /* Allow wrapping */
-  word-wrap: break-word;
+  width: 90%;
+  max-width: 95%;
+  margin: 10px auto 15px;
+  text-align: right;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 /* Form Container */
@@ -55,10 +58,13 @@ body {
   border-radius: 12px;
   box-sizing: border-box;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  width: 550px; /* Slightly wider */
+  width: 95%;
+  max-width: 500px;
+  padding: 20px;
   text-align: center;
-  margin: auto;
+  margin: 10px auto;
   position: relative;
+  min-height: auto;
   top: 50%;
   transform: translateY(20%);
   z-index: 1;
@@ -251,47 +257,53 @@ button.back-btn:hover {
   body {
     flex-direction: column;
     justify-content: flex-start;
-    padding: 0 10px;
+    align-items: center;
+    padding: 10px;
   }
 
   .page-header {
+    text-align: left;
     position: relative;
-    top: 10px;
-    left: 0;
-    text-align: center;
-    margin-bottom: 10px;
+    margin: 10px 0;
   }
 
   .page-header .logo {
-    height: 100px;
+    height: 120px;
   }
 
   .quote-container {
-    position: relative;
-    text-align: center;
-    transform: none;
-    margin: 5px auto 15px;
-    font-size: 1.2rem;
-    width: 100%;              /* Full width of mobile screen */
-    max-width: 90%;           /* Keep text inside viewport */
-    overflow: hidden;         /* Prevent overflow of typing text */
-    white-space: nowrap;      /* Keep typing effect in one line */
+    font-size: 1.3rem;
+    margin: 10px 0;
+    width: 90%;
   }
 
   .container {
-    width: 95%;
-    max-width: 500px;
-    margin: 0 auto;
+    width: 90%;
+    max-width: 450px;
+    margin: 10px 0;
     padding: 20px;
   }
 
   .footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    padding: 10px;
-    background: rgba(0, 0, 0, 0.05);
+    position: relative;
+    bottom: auto;
+    margin-top: 15px;
   }
 }
 
+@media (max-width: 600px) {
+  .quote-container {
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  .page-header .logo {
+    height: 80px;
+  }
+
+  .container {
+    width: 95%;
+    max-width: 350px;
+    padding: 15px;
+  }
+}
