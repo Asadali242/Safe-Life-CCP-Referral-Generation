@@ -40,7 +40,7 @@ body {
   color: #ffffff;
   font-family: 'Montserrat', sans-serif;
   font-weight: 600;
-  margin: 120px auto 30px; /* Add spacing below logo */
+  margin: 150px auto 30px; /* Add spacing below logo */
   max-width: 80%;
   white-space: normal;
   overflow: hidden;
@@ -56,7 +56,7 @@ body {
   width: 95%;
   max-width: 500px;
   text-align: center;
-  margin: 30px auto 70px;;
+  margin: 10px auto 40px;;
   position: relative;
   z-index: 1;
 }
