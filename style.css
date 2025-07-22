@@ -60,13 +60,11 @@ body {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   width: 95%;
   max-width: 500px;
-  padding: 20px;
   text-align: center;
-  margin: 10px auto;
+  margin: auto;
+  margin-top: 140px;
+  margin-bottom: 100px;
   position: relative;
-  min-height: auto;
-  top: 50%;
-  transform: translateY(20%);
   z-index: 1;
 }
 
@@ -77,14 +75,14 @@ main.container {
 
 /* Footer */
 .footer {
-  position: relative;
+  position: fixed;
   bottom: 0;
   width: 100%;
   text-align: center;
   font-size: 1rem;
   color: rgba(255, 255, 255, 0.9);
   padding: 10px;
-  margin-top: 20px;
+  background: rgba(0, 0, 0, 0.05);
 }
 
 .footer p {
@@ -254,49 +252,38 @@ button.back-btn:hover {
 
 /* Mobile & Tablet Styles */
 @media (max-width: 1024px) {
-  body {
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    padding: 10px;
+  .quote-container {
+    display: none; /* Remove quote on mobile/iPad */
   }
 
   .page-header {
     text-align: left;
     position: relative;
-    margin: 10px 0;
+    margin: 15px 0 5px 15px;
   }
 
   .page-header .logo {
-    height: 120px;
-  }
-
-  .quote-container {
-    font-size: 1.3rem;
-    margin: 10px 0;
-    width: 90%;
+    height: 100px;
   }
 
   .container {
     width: 90%;
     max-width: 450px;
-    margin: 10px 0;
+    margin: 20px auto;
     padding: 20px;
   }
 
   .footer {
-    position: relative;
-    bottom: auto;
-    margin-top: 15px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    margin: 0;
+    background: rgba(0, 0, 0, 0.05);
   }
 }
 
 @media (max-width: 600px) {
-  .quote-container {
-    font-size: 1rem;
-    text-align: center;
-  }
-
   .page-header .logo {
     height: 80px;
   }
@@ -305,5 +292,6 @@ button.back-btn:hover {
     width: 95%;
     max-width: 350px;
     padding: 15px;
+    margin: 20px auto;
   }
 }
