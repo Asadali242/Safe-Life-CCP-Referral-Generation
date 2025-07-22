@@ -195,35 +195,6 @@ document.getElementById('leadForm').addEventListener('submit', async function(e)
   updateProgressBar(); // This will now set progress to 100%
 });
 
-// Typing animation for quote
-const quoteText = "Keeping You Home, Keeping You Safe!";
-let quoteIndex = 0;
-let isDeleting = false;
-
-function typeQuote() {
-  const typingElement = document.getElementById('typingQuote');
-
-  if (!isDeleting) {
-    typingElement.textContent = quoteText.substring(0, quoteIndex + 1);
-    quoteIndex++;
-    if (quoteIndex === quoteText.length) {
-      isDeleting = true;
-      setTimeout(typeQuote, 1500); // Pause after full text
-      return;
-    }
-  } else {
-    typingElement.textContent = quoteText.substring(0, quoteIndex - 1);
-    quoteIndex--;
-    if (quoteIndex === 0) {
-      isDeleting = false; // Start typing again
-    }
-  }
-
-  setTimeout(typeQuote, isDeleting ? 50 : 100); // Adjust typing/deleting speed
-}
-
-document.addEventListener('DOMContentLoaded', typeQuote);
-
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/service-worker.js')
     .then(() => console.log('Service Worker Registered'))
