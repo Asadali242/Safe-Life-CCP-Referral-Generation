@@ -1,37 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
-</html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SafeLife Lead Capture</title>
+  <title>Safe Life Home Care Form</title>
   <link rel="stylesheet" href="style.css">
   <script defer src="script.js"></script>
 </head>
 <body>
+
+  <!-- Header -->
   <header class="page-header">
-    <img src="icon.png" alt="SafeLife Logo" class="logo">
+    <img src="icon.png" alt="Safe Life Logo" class="logo">
   </header>
-  <div class="quote-container" id="typingQuote"></div>
-  <div class="container">
-    <!-- Progress Bar -->
+
+  <!-- Quote -->
+  <div class="quote-container">
+    <span id="quoteText">Keeping You Home, Keeping You Safe!</span>
+  </div>
+
+  <!-- Form Container -->
+  <main class="container">
     <div class="progress-container">
       <div class="progress-bar" id="progressBar"></div>
     </div>
-    <p id="stepIndicator" class="step-indicator">Step 1 of 6</p>
+    <p class="step-indicator" id="stepIndicator">Step 1 of 5</p>
 
-    <!-- Form -->
     <h2>Safe Life Home Care Information Form</h2>
+
     <form id="leadForm">
-      <!-- Step 1 -->
+      <!-- Step 1: Name -->
       <div class="step active">
         <label>Your Name <span class="required-label">(required)</span></label>
         <input type="text" name="name" id="name" placeholder="Enter your full name" required>
         <p class="error-message" id="nameError"></p>
         <button type="button" onclick="validateStep(0)">Next</button>
-      </div>      
-      
-      <!-- Step 2 -->
+      </div>
+
+      <!-- Step 2: Relation -->
       <div class="step">
         <label>Your Relation with the Client <span class="required-label">(required)</span></label>
         <input type="text" name="relation" id="relation" placeholder="e.g., Daughter, Friend" required>
@@ -41,9 +47,8 @@
           <button type="button" onclick="validateStep(1)">Next</button>
         </div>
       </div>
-           
-      
-      <!-- Step 3 -->
+
+      <!-- Step 3: Medicaid -->
       <div class="step">
         <label>Does the Client have Medicaid? <span class="required-label">(required)</span></label>
         <select name="medicaid" id="medicaid" onchange="toggleMedicaidField()" required>
@@ -52,58 +57,58 @@
           <option value="no">No</option>
         </select>
         <p class="error-message" id="medicaidError"></p>
-      
         <div id="medicaidNumberContainer" style="display:none; margin-top:20px;">
           <label>Medicaid Number (if known)</label>
           <input type="text" name="medicaid_number" placeholder="Enter Medicaid number">
         </div>
-      
         <div class="button-group">
           <button type="button" class="back-btn" onclick="prevStep()">Back</button>
           <button type="button" onclick="validateStep(2)">Next</button>
         </div>
-      </div>            
+      </div>
 
-      <!-- Step 4 -->
+      <!-- Step 4: Phone/Email -->
       <div class="step">
         <label>Phone</label>
         <input type="tel" name="phone" id="phone" placeholder="e.g., 123-456-7890">
         <p class="error-message" id="phoneError"></p>
-      
+
         <label>Email</label>
         <input type="email" name="email" id="email" placeholder="your@email.com">
         <p class="error-message" id="emailError"></p>
-      
+
         <p class="required-label">Please enter either your Phone number or Email (or both).</p>
-      
+
         <div class="button-group">
           <button type="button" class="back-btn" onclick="prevStep()">Back</button>
           <button type="button" onclick="validateStep(3)">Next</button>
         </div>
-      </div>            
-      
-      <!-- Step 5 -->
+      </div>
+
+      <!-- Step 5: Additional Info -->
       <div class="step">
         <label>Any other related info</label>
         <textarea name="info" rows="4" placeholder="If you want us to know anything else, please write it here"></textarea>
-      
         <div class="button-group">
           <button type="button" class="back-btn" onclick="prevStep()">Back</button>
           <button type="submit">Submit</button>
         </div>
-      </div>      
+      </div>
 
-      <!-- Step 6 -->
+      <!-- Thank You Step -->
       <div class="step" id="thankYouStep">
         <h3>Your responses have been recorded.<br>Thank you!</h3>
         <button type="button" class="restart-btn" onclick="restartForm()">Start Another Response</button>
-      </div>      
+      </div>
     </form>
-  </div>
+  </main>
+
+  <!-- Footer -->
   <footer class="footer">
     <p>Safe Life Home Health Care</p>
     <p>101 W 22<sup>nd</sup> St, STE 202, Lombard, IL 60148</p>
-    <p>Ph: (855) 723-3440 &nbsp; | &nbsp; Fax: (630) 406-8342</p>
-  </footer>    
+    <p>Ph: (855) 723-3440 | Fax: (630) 406-8342</p>
+  </footer>
+
 </body>
 </html>
