@@ -28,27 +28,22 @@ body {
 }
 
 .page-header .logo {
-  height: 150px;
+  height: 120px;
   width: auto;
 }
 
 /* Quote - Desktop */
 .quote-container {
-  position: absolute;
-  right: 50px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 1.2rem;
+  position: relative;
+  text-align: center;
+  font-size: 1.3rem;
   color: #ffffff;
   font-family: 'Montserrat', sans-serif;
   font-weight: 600;
-  width: 90%;
-  max-width: 95%;
-  margin: 10px auto 15px;
-  text-align: right;
+  margin: 120px auto 30px; /* Add spacing below logo */
+  max-width: 80%;
+  white-space: normal;
   overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
 }
 
 /* Form Container */
@@ -61,16 +56,9 @@ body {
   width: 95%;
   max-width: 500px;
   text-align: center;
-  margin: auto;
-  margin-top: 140px;
-  margin-bottom: 100px;
+  margin: 30px auto 70px;;
   position: relative;
   z-index: 1;
-}
-
-main.container {
-  margin-top: auto;
-  margin-bottom: auto;
 }
 
 /* Footer */
@@ -86,7 +74,7 @@ main.container {
 }
 
 .footer p {
-  margin: 2px 0;
+  margin: auto;
 }
 
 /* Progress Bar */
