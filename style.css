@@ -251,6 +251,7 @@ button.back-btn:hover {
   body {
     flex-direction: column;
     justify-content: flex-start;
+    padding: 0 10px;
   }
 
   .page-header {
@@ -269,22 +270,28 @@ button.back-btn:hover {
     position: relative;
     text-align: center;
     transform: none;
-    margin: 10px auto 20px;
-    font-size: 1.3rem;
-    width: 90%;
+    margin: 5px auto 15px;
+    font-size: 1.2rem;
+    width: 100%;              /* Full width of mobile screen */
+    max-width: 90%;           /* Keep text inside viewport */
+    overflow: hidden;         /* Prevent overflow of typing text */
+    white-space: nowrap;      /* Keep typing effect in one line */
   }
 
   .container {
-    width: 90%;
-    max-width: 90%;
-    margin: 0 auto 20px;
+    width: 95%;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
   }
 
   .footer {
     position: fixed;
     bottom: 0;
     left: 0;
-    padding: 15px;
-    background: rgba(0, 0, 0, 0.1);
+    width: 100%;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.05);
   }
 }
+
