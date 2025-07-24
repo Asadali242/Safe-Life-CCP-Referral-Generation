@@ -168,6 +168,13 @@ function restartForm() {
 // Handle form submission
 document.getElementById('leadForm').addEventListener('submit', async function(e) {
   e.preventDefault();
+
+  const submitButton = this.querySelector('button[type="submit"]');
+  if (submitButton.disabled) return; // Prevent multiple submissions
+
+  submitButton.disabled = true;     // Disable the button
+  submitButton.textContent = "Submitting..."; // Optional: show loading state
+
   const formData = new FormData(this);
   const data = Object.fromEntries(formData);
 
@@ -181,18 +188,24 @@ document.getElementById('leadForm').addEventListener('submit', async function(e)
 
     if (!response.ok) {
       console.error('Server error:', response.statusText);
+      submitButton.disabled = false; // Re-enable button if error occurs
+      submitButton.textContent = "Submit";
+      return;
     } else {
       console.log('Form submitted successfully!');
     }
+
+    // Show thank-you step and complete the progress
+    steps[currentStep].classList.remove('active');
+    currentStep = totalSteps; // Force to last step
+    steps[currentStep].classList.add('active');
+    updateProgressBar(); // This will now set progress to 100%
+
   } catch (err) {
     console.error('Error submitting form:', err);
+    submitButton.disabled = false;  // Re-enable button if error occurs
+    submitButton.textContent = "Submit";
   }
-
-  // Show thank-you step and complete the progress
-  steps[currentStep].classList.remove('active');
-  currentStep = totalSteps; // Force to last step
-  steps[currentStep].classList.add('active');
-  updateProgressBar(); // This will now set progress to 100%
 });
 
 if ('serviceWorker' in navigator) {
