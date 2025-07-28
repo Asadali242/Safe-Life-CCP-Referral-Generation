@@ -49,7 +49,29 @@
         </div>
       </div>
 
-      <!-- Step 3: Medicaid -->
+      <!-- Step 3: Birth Date -->
+      <div class="step">
+        <label>Do you know the Birthdate of the Client? <span class="required-label">(required)</span></label>
+        <select name="know_birthdate" id="know_birthdate" onchange="toggleBirthDateField()" required>
+          <option value="">Select</option>
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
+        <p class="error-message" id="knowBirthdateError"></p>
+
+        <div id="birthdateContainer" style="display:none; margin-top: 20px;">
+          <label>Birthdate (mm/dd/yyyy)</label>
+          <input type="text" name="birthdate" id="birthdate" placeholder="mm/dd/yyyy">
+          <p class="error-message" id="birthdateError"></p>
+        </div>
+
+        <div class="button-group">
+          <button type="button" class="back-btn" onclick="prevStep()">Back</button>
+          <button type="button" onclick="validateStep(2)">Next</button>
+        </div>
+      </div>
+
+      <!-- Step 4: Medicaid -->
       <div class="step">
         <label>Does the Client have Medicaid? <span class="required-label">(required)</span></label>
         <select name="medicaid" id="medicaid" onchange="toggleMedicaidField()" required>
@@ -68,7 +90,7 @@
         </div>
       </div>
 
-      <!-- Step 4: Phone/Email -->
+      <!-- Step 5: Phone/Email -->
       <div class="step">
         <label>Phone</label>
         <input type="tel" name="phone" id="phone" placeholder="e.g., 123-456-7890">
@@ -86,7 +108,45 @@
         </div>
       </div>
 
-      <!-- Step 5: Additional Info -->
+      <!-- Step 6: Address Question -->
+      <div class="step">
+        <label>Do you want to provide your Address? <span class="required-label">(required)</span></label>
+        <select name="provide_address" id="provide_address" onchange="toggleAddressFields()" required>
+          <option value="">Select</option>
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
+        <p class="error-message" id="provideAddressError"></p>
+
+        <!-- Address Fields (hidden by default) -->
+        <div id="addressFields" style="display:none; margin-top: 20px;">
+          <label>Address Line 1 <span class="required-label">(required)</span></label>
+          <input type="text" name="address_line1" id="address_line1" placeholder="Enter address line 1">
+          <p class="error-message" id="addressLine1Error"></p>
+
+          <label>Address Line 2</label>
+          <input type="text" name="address_line2" id="address_line2" placeholder="Enter address line 2 (optional)">
+
+          <label>City <span class="required-label">(required)</span></label>
+          <input type="text" name="city" id="city" placeholder="Enter city">
+          <p class="error-message" id="cityError"></p>
+
+          <label>State <span class="required-label">(required)</span></label>
+          <input type="text" name="state" id="state" placeholder="Enter state">
+          <p class="error-message" id="stateError"></p>
+
+          <label>Zip Code <span class="required-label">(required)</span></label>
+          <input type="text" name="zip" id="zip" placeholder="e.g., 60148">
+          <p class="error-message" id="zipError"></p>
+        </div>
+
+        <div class="button-group">
+          <button type="button" class="back-btn" onclick="prevStep()">Back</button>
+          <button type="button" onclick="validateStep(4)">Next</button>
+        </div>
+      </div>
+
+      <!-- Step 7: Additional Info -->
       <div class="step">
         <label>Any other related info</label>
         <textarea name="info" rows="4" placeholder="If you want us to know anything else, please write it here"></textarea>

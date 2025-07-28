@@ -1,6 +1,6 @@
 let currentStep = 0;
 const steps = document.querySelectorAll('.step');
-const totalSteps = steps.length - 1; // Keep this line (thank-you is excluded)
+const totalSteps = steps.length - 1; // Thank-you step excluded
 
 // Initialize progress bar on page load
 document.addEventListener('DOMContentLoaded', () => {
@@ -14,7 +14,7 @@ function validateStep(stepIndex) {
     const nameError = document.getElementById('nameError');
     const nameValue = nameField.value.trim();
     const nameRegex = /^[A-Za-z ]+$/; // Only letters and spaces
-  
+
     if (!nameValue) {
       nameError.textContent = "Please enter your name.";
       nameError.style.display = "block";
@@ -26,6 +26,8 @@ function validateStep(stepIndex) {
     } else {
       nameError.style.display = "none";
     }
+    nextStep();
+    return;
   }
 
   // Step 1: Relation
@@ -34,7 +36,7 @@ function validateStep(stepIndex) {
     const relationError = document.getElementById('relationError');
     const relationValue = relationField.value.trim();
     const relationRegex = /^[A-Za-z ]+$/; // Only letters and spaces
-  
+
     if (!relationValue) {
       relationError.textContent = "Please enter your relation with the client.";
       relationError.style.display = "block";
@@ -46,10 +48,47 @@ function validateStep(stepIndex) {
     } else {
       relationError.style.display = "none";
     }
+    nextStep();
+    return;
   }
 
-  // Step 2: Medicaid
+  // Step 2: Birth Date
   if (stepIndex === 2) {
+    const knowBirthdate = document.getElementById('know_birthdate').value;
+    const knowBirthdateError = document.getElementById('knowBirthdateError');
+    knowBirthdateError.style.display = "none";
+
+    if (!knowBirthdate) {
+      knowBirthdateError.textContent = "Please select Yes or No.";
+      knowBirthdateError.style.display = "block";
+      return;
+    }
+
+    // If "Yes", validate birthdate format
+    if (knowBirthdate === 'yes') {
+      const birthdateField = document.getElementById('birthdate');
+      const birthdateError = document.getElementById('birthdateError');
+      birthdateError.style.display = "none";
+
+      const value = birthdateField.value.trim();
+      const birthdatePattern = /^(0[1-9]|1[0-2])\/(0[1-9]|[12][0-9]|3[01])\/(19|20)\d{2}$/;
+
+      if (!value) {
+        birthdateError.textContent = "Please enter the birthdate.";
+        birthdateError.style.display = "block";
+        return;
+      } else if (!birthdatePattern.test(value)) {
+        birthdateError.textContent = "Enter a valid date in mm/dd/yyyy format.";
+        birthdateError.style.display = "block";
+        return;
+      }
+    }
+    nextStep();
+    return;
+  }
+
+  // Step 3: Medicaid
+  if (stepIndex === 3) {
     const medicaidDropdown = document.getElementById('medicaid');
     const medicaidError = document.getElementById('medicaidError');
     if (!medicaidDropdown || !medicaidError) return;
@@ -61,10 +100,12 @@ function validateStep(stepIndex) {
     } else {
       medicaidError.style.display = "none";
     }
+    nextStep();
+    return;
   }
 
-  // Step 3: Phone/Email
-  if (stepIndex === 3) {
+  // Step 4: Phone/Email
+  if (stepIndex === 4) {
     const phoneField = document.getElementById('phone');
     const emailField = document.getElementById('email');
     const phoneError = document.getElementById('phoneError');
@@ -101,10 +142,100 @@ function validateStep(stepIndex) {
       emailError.style.display = "block";
       return;
     }
+    nextStep();
+    return;
   }
 
-  // Move to next step if validation passes
-  nextStep();
+  // Step 5: Address Question + Fields
+  if (stepIndex === 5) {
+    const provideAddress = document.getElementById('provide_address').value;
+    const provideAddressError = document.getElementById('provideAddressError');
+    provideAddressError.style.display = "none";
+
+    // Must choose Yes or No
+    if (!provideAddress) {
+      provideAddressError.textContent = "Please select Yes or No.";
+      provideAddressError.style.display = "block";
+      return;
+    }
+
+    // If "Yes", validate all address fields
+    if (provideAddress === 'yes') {
+      const line1 = document.getElementById('address_line1');
+      const city = document.getElementById('city');
+      const state = document.getElementById('state');
+      const zip = document.getElementById('zip');
+
+      const line1Error = document.getElementById('addressLine1Error');
+      const cityError = document.getElementById('cityError');
+      const stateError = document.getElementById('stateError');
+      const zipError = document.getElementById('zipError');
+
+      let valid = true;
+
+      // Reset errors
+      line1Error.style.display = "none";
+      cityError.style.display = "none";
+      stateError.style.display = "none";
+      zipError.style.display = "none";
+
+      // Validate Address Line 1
+      if (!line1.value.trim()) {
+        line1Error.textContent = "Address Line 1 is required.";
+        line1Error.style.display = "block";
+        valid = false;
+      }
+
+      // Validate City (letters and spaces only)
+      const cityPattern = /^[A-Za-z ]+$/;
+      if (!city.value.trim()) {
+        cityError.textContent = "City is required.";
+        cityError.style.display = "block";
+        valid = false;
+      } else if (!cityPattern.test(city.value.trim())) {
+        cityError.textContent = "City can only contain letters and spaces.";
+        cityError.style.display = "block";
+        valid = false;
+      }
+
+      // Validate State (2 uppercase letters)
+      const statePattern = /^[A-Z]{2}$/;
+      const stateValue = state.value.trim().toUpperCase(); // Convert to uppercase
+      state.value = stateValue; // Update input to uppercase automatically
+
+      if (!stateValue) {
+        stateError.textContent = "State is required.";
+        stateError.style.display = "block";
+        valid = false;
+      } else if (!statePattern.test(stateValue)) {
+        stateError.textContent = "State must be exactly 2 letters (e.g., IL).";
+        stateError.style.display = "block";
+        valid = false;
+      }
+
+      // Validate Zip (must be 5 digits)
+      const zipPattern = /^[0-9]{5}$/;
+      if (!zip.value.trim()) {
+        zipError.textContent = "Zip Code is required.";
+        zipError.style.display = "block";
+        valid = false;
+      } else if (!zipPattern.test(zip.value.trim())) {
+        zipError.textContent = "Enter a valid 5-digit Zip Code.";
+        zipError.style.display = "block";
+        valid = false;
+      }
+
+      if (!valid) return; // Stop if validation fails
+    }
+    nextStep();
+    return;
+  }
+
+  // Step 6: Additional Info (No validation needed)
+  if (stepIndex === 6) {
+    nextStep();
+    return;
+  }
 }
 
 // Move to the next step
@@ -133,7 +264,6 @@ function updateProgressBar() {
   const stepIndicator = document.getElementById('stepIndicator');
 
   if (currentStep >= totalSteps) {
-    // On thank-you screen, show full progress
     progressBar.style.width = `100%`;
     stepIndicator.textContent = `Step ${totalSteps} of ${totalSteps}`;
   } else {
@@ -143,25 +273,29 @@ function updateProgressBar() {
   }
 }
 
-// Show or hide Medicaid number field based on selection
+function toggleBirthDateField() {
+  const knowBirthdate = document.getElementById('know_birthdate').value;
+  const birthdateContainer = document.getElementById('birthdateContainer');
+  birthdateContainer.style.display = (knowBirthdate === 'yes') ? 'block' : 'none';
+}
+
 function toggleMedicaidField() {
   const medicaid = document.getElementById('medicaid').value;
   const medicaidContainer = document.getElementById('medicaidNumberContainer');
   medicaidContainer.style.display = (medicaid === 'yes') ? 'block' : 'none';
 }
 
+function toggleAddressFields() {
+  const provideAddress = document.getElementById('provide_address').value;
+  const addressFields = document.getElementById('addressFields');
+  addressFields.style.display = (provideAddress === 'yes') ? 'block' : 'none';
+}
+
 function restartForm() {
-  // Reset form fields
   document.getElementById('leadForm').reset();
-
-  // Hide thank-you step
   steps[currentStep].classList.remove('active');
-
-  // Go back to the first step
   currentStep = 0;
   steps[currentStep].classList.add('active');
-
-  // Reset progress bar
   updateProgressBar();
 }
 
@@ -170,16 +304,15 @@ document.getElementById('leadForm').addEventListener('submit', async function(e)
   e.preventDefault();
 
   const submitButton = this.querySelector('button[type="submit"]');
-  if (submitButton.disabled) return; // Prevent multiple submissions
+  if (submitButton.disabled) return;
 
-  submitButton.disabled = true;     // Disable the button
-  submitButton.textContent = "Submitting..."; // Optional: show loading state
+  submitButton.disabled = true;
+  submitButton.textContent = "Submitting...";
 
   const formData = new FormData(this);
   const data = Object.fromEntries(formData);
 
   try {
-    // Send data to backend (Google Apps Script or Netlify function)
     const response = await fetch('/.netlify/functions/submit-lead', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -188,22 +321,18 @@ document.getElementById('leadForm').addEventListener('submit', async function(e)
 
     if (!response.ok) {
       console.error('Server error:', response.statusText);
-      submitButton.disabled = false; // Re-enable button if error occurs
+      submitButton.disabled = false;
       submitButton.textContent = "Submit";
       return;
-    } else {
-      console.log('Form submitted successfully!');
     }
 
-    // Show thank-you step and complete the progress
     steps[currentStep].classList.remove('active');
-    currentStep = totalSteps; // Force to last step
+    currentStep = totalSteps;
     steps[currentStep].classList.add('active');
-    updateProgressBar(); // This will now set progress to 100%
-
+    updateProgressBar();
   } catch (err) {
     console.error('Error submitting form:', err);
-    submitButton.disabled = false;  // Re-enable button if error occurs
+    submitButton.disabled = false;
     submitButton.textContent = "Submit";
   }
 });

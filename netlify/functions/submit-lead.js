@@ -11,11 +11,31 @@ export const handler = async (event, context) => {
   try {
     const data = JSON.parse(event.body);
 
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbwdAfKMf1B6-uE8FTm_tcVrb21s28p4Hzx_8nzHwM_MSBaKE4AYCxlqynfEEl3zu_GB/exec';
+    // Construct payload, including address fields
+    const payload = {
+      name: data.name,
+      relation: data.relation,
+      birthdate: data.birthdate || "", // new
+      medicaid: data.medicaid,
+      medicaid_number: data.medicaid_number,
+      phone: data.phone,
+      email: data.email,
+      address_line1: data.address_line1,
+      address_line2: data.address_line2,
+      city: data.city,
+      state: data.state,
+      zip: data.zip,
+      info: data.info
+    };
+
+    // Google Apps Script endpoint
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbwbpWGjVetqfuK2FNa5BEexKseYVQgSl25j3rnr13ehMRJ7sy39ZCflkskUJMmArAK2/exec';
+
+    // Send data to Google Apps Script
     const response = await fetch(GAS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
