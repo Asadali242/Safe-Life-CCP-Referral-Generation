@@ -57,22 +57,20 @@ function validateStep(stepIndex) {
     const knowBirthdate = document.getElementById('know_birthdate').value;
     const knowBirthdateError = document.getElementById('knowBirthdateError');
     knowBirthdateError.style.display = "none";
-
+  
     if (!knowBirthdate) {
       knowBirthdateError.textContent = "Please select Yes or No.";
       knowBirthdateError.style.display = "block";
       return;
     }
-
-    // If "Yes", validate birthdate format
+  
     if (knowBirthdate === 'yes') {
       const birthdateField = document.getElementById('birthdate');
       const birthdateError = document.getElementById('birthdateError');
       birthdateError.style.display = "none";
-
       const value = birthdateField.value.trim();
       const birthdatePattern = /^(0[1-9]|1[0-2])\/(0[1-9]|[12][0-9]|3[01])\/(19|20)\d{2}$/;
-
+  
       if (!value) {
         birthdateError.textContent = "Please enter the birthdate.";
         birthdateError.style.display = "block";
@@ -82,11 +80,26 @@ function validateStep(stepIndex) {
         birthdateError.style.display = "block";
         return;
       }
+    } else if (knowBirthdate === 'no') {
+      const ageField = document.getElementById('age');
+      const ageError = document.getElementById('ageError');
+      ageError.style.display = "none";
+  
+      if (!ageField.value.trim()) {
+        ageError.textContent = "Please enter the client's age.";
+        ageError.style.display = "block";
+        return;
+      } else if (isNaN(ageField.value.trim()) || ageField.value.trim() <= 0 || ageField.value.trim() > 120) {
+        ageError.textContent = "Enter a valid age (1–120).";
+        ageError.style.display = "block";
+        return;
+      }
     }
+  
     nextStep();
     return;
   }
-
+  
   // Step 3: Medicaid
   if (stepIndex === 3) {
     const medicaidDropdown = document.getElementById('medicaid');
@@ -152,7 +165,6 @@ function validateStep(stepIndex) {
     const provideAddressError = document.getElementById('provideAddressError');
     provideAddressError.style.display = "none";
 
-    // Must choose Yes or No
     if (!provideAddress) {
       provideAddressError.textContent = "Please select Yes or No.";
       provideAddressError.style.display = "block";
@@ -227,6 +239,25 @@ function validateStep(stepIndex) {
 
       if (!valid) return; // Stop if validation fails
     }
+
+    // If "No", validate County field
+    if (provideAddress === 'no') {
+      const countyField = document.getElementById('county');
+      const countyError = document.getElementById('countyError');
+      countyError.style.display = "none";
+
+      const countyPattern = /^[A-Za-z ]+$/;
+      if (!countyField.value.trim()) {
+        countyError.textContent = "Please enter the county.";
+        countyError.style.display = "block";
+        return;
+      } else if (!countyPattern.test(countyField.value.trim())) {
+        countyError.textContent = "County can only contain letters and spaces.";
+        countyError.style.display = "block";
+        return;
+      }
+    }
+
     nextStep();
     return;
   }
@@ -273,10 +304,10 @@ function updateProgressBar() {
   }
 }
 
-function toggleBirthDateField() {
+function toggleBirthOrAgeField() {
   const knowBirthdate = document.getElementById('know_birthdate').value;
-  const birthdateContainer = document.getElementById('birthdateContainer');
-  birthdateContainer.style.display = (knowBirthdate === 'yes') ? 'block' : 'none';
+  document.getElementById('birthdateContainer').style.display = (knowBirthdate === 'yes') ? 'block' : 'none';
+  document.getElementById('ageContainer').style.display = (knowBirthdate === 'no') ? 'block' : 'none';
 }
 
 function toggleMedicaidField() {
@@ -285,10 +316,10 @@ function toggleMedicaidField() {
   medicaidContainer.style.display = (medicaid === 'yes') ? 'block' : 'none';
 }
 
-function toggleAddressFields() {
+function toggleAddressOrCounty() {
   const provideAddress = document.getElementById('provide_address').value;
-  const addressFields = document.getElementById('addressFields');
-  addressFields.style.display = (provideAddress === 'yes') ? 'block' : 'none';
+  document.getElementById('addressFields').style.display = (provideAddress === 'yes') ? 'block' : 'none';
+  document.getElementById('countyContainer').style.display = (provideAddress === 'no') ? 'block' : 'none';
 }
 
 function restartForm() {

@@ -49,10 +49,10 @@
         </div>
       </div>
 
-      <!-- Step 3: Birth Date -->
+      <!-- Step 3: Birthdate / Age -->
       <div class="step">
         <label>Do you know the Birthdate of the Client? <span class="required-label">(required)</span></label>
-        <select name="know_birthdate" id="know_birthdate" onchange="toggleBirthDateField()" required>
+        <select name="know_birthdate" id="know_birthdate" onchange="toggleBirthOrAgeField()" required>
           <option value="">Select</option>
           <option value="yes">Yes</option>
           <option value="no">No</option>
@@ -63,6 +63,12 @@
           <label>Birthdate (mm/dd/yyyy)</label>
           <input type="text" name="birthdate" id="birthdate" placeholder="mm/dd/yyyy">
           <p class="error-message" id="birthdateError"></p>
+        </div>
+
+        <div id="ageContainer" style="display:none; margin-top: 20px;">
+          <label>How old is the Client?</label>
+          <input type="number" name="age" id="age" placeholder="Enter age (in years)">
+          <p class="error-message" id="ageError"></p>
         </div>
 
         <div class="button-group">
@@ -108,17 +114,16 @@
         </div>
       </div>
 
-      <!-- Step 6: Address Question -->
+      <!-- Step 6: Address / County -->
       <div class="step">
         <label>Do you want to provide your Address? <span class="required-label">(required)</span></label>
-        <select name="provide_address" id="provide_address" onchange="toggleAddressFields()" required>
+        <select name="provide_address" id="provide_address" onchange="toggleAddressOrCounty()" required>
           <option value="">Select</option>
           <option value="yes">Yes</option>
           <option value="no">No</option>
         </select>
         <p class="error-message" id="provideAddressError"></p>
 
-        <!-- Address Fields (hidden by default) -->
         <div id="addressFields" style="display:none; margin-top: 20px;">
           <label>Address Line 1 <span class="required-label">(required)</span></label>
           <input type="text" name="address_line1" id="address_line1" placeholder="Enter address line 1">
@@ -132,17 +137,23 @@
           <p class="error-message" id="cityError"></p>
 
           <label>State <span class="required-label">(required)</span></label>
-          <input type="text" name="state" id="state" placeholder="Enter state">
+          <input type="text" name="state" id="state" placeholder="State (e.g., IL)">
           <p class="error-message" id="stateError"></p>
 
           <label>Zip Code <span class="required-label">(required)</span></label>
-          <input type="text" name="zip" id="zip" placeholder="e.g., 60148">
+          <input type="text" name="zip" id="zip" placeholder="Enter zip code">
           <p class="error-message" id="zipError"></p>
+        </div>
+
+        <div id="countyContainer" style="display:none; margin-top: 20px;">
+          <label>Which county does the client live in?</label>
+          <input type="text" name="county" id="county" placeholder="Enter county name">
+          <p class="error-message" id="countyError"></p>
         </div>
 
         <div class="button-group">
           <button type="button" class="back-btn" onclick="prevStep()">Back</button>
-          <button type="button" onclick="validateStep(4)">Next</button>
+          <button type="button" onclick="validateStep(5)">Next</button>
         </div>
       </div>
 

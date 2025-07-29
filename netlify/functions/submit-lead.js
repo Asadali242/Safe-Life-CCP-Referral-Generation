@@ -15,7 +15,8 @@ export const handler = async (event, context) => {
     const payload = {
       name: data.name,
       relation: data.relation,
-      birthdate: data.birthdate || "", // new
+      birthdate: data.birthdate || "",
+      age: data.age || "",
       medicaid: data.medicaid,
       medicaid_number: data.medicaid_number,
       phone: data.phone,
@@ -25,11 +26,12 @@ export const handler = async (event, context) => {
       city: data.city,
       state: data.state,
       zip: data.zip,
+      county: data.county || "",
       info: data.info
-    };
+    };    
 
     // Google Apps Script endpoint
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbwbpWGjVetqfuK2FNa5BEexKseYVQgSl25j3rnr13ehMRJ7sy39ZCflkskUJMmArAK2/exec';
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbxnV_lDmGFUxSowFUN7gXrLuCeSkHVxQtEQbJqGxZu8S8VaFJ8_wnyB0Vz-TPmtptxJ/exec';
 
     // Send data to Google Apps Script
     const response = await fetch(GAS_URL, {
