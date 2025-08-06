@@ -30,7 +30,7 @@ export const handler = async (event, context) => {
     };
 
     // Google Apps Script endpoint
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbzuBGdSSjx9cIK3QvV3-ja7sfInZ6gevdr2oOG3EGoxGsOuQk0Wy9d7KjtIRa5Our8N/exec';
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbzSbjRvXSXATOWf-4IHLu8C5hkR8JpjGHuF5JgQN4eBMnsUVFttKL5OHwKW0D_FMpm5/exec';
 
     // Send data to Google Apps Script
     const response = await fetch(GAS_URL, {

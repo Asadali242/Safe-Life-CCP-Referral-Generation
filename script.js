@@ -5,6 +5,11 @@ const totalSteps = steps.length - 1; // Thank-you step excluded
 // Initialize progress bar on page load
 document.addEventListener('DOMContentLoaded', () => {
   updateProgressBar();
+
+  // Re-attach conditional field logic on load
+  document.getElementById('know_birthdate').addEventListener('change', toggleBirthOrAgeField);
+  document.getElementById('provide_address').addEventListener('change', toggleAddressOrCounty);
+  toggleAddressOrCounty();
 });
 
 function validateStep(stepIndex) {
@@ -103,16 +108,15 @@ function validateStep(stepIndex) {
   // Step 3: Medicaid
   if (stepIndex === 3) {
     const medicaidDropdown = document.getElementById('medicaid');
-    const medicaidError = document.getElementById('medicaidError');
-    if (!medicaidDropdown || !medicaidError) return;
+    const medicaidError    = document.getElementById('medicaidError');
+    medicaidError.style.display = "none";
 
-    if (medicaidDropdown.value === "") {
-      medicaidError.textContent = "Please select an option.";
+    if (!medicaidDropdown.value) {
+      medicaidError.textContent = "Please select Yes or No.";
       medicaidError.style.display = "block";
       return;
-    } else {
-      medicaidError.style.display = "none";
     }
+
     nextStep();
     return;
   }
@@ -161,101 +165,82 @@ function validateStep(stepIndex) {
 
   // Step 5: Address Question + Fields
   if (stepIndex === 5) {
-    const provideAddress = document.getElementById('provide_address').value;
-    const provideAddressError = document.getElementById('provideAddressError');
-    provideAddressError.style.display = "none";
+    const provide      = document.getElementById('provide_address').value;
+    const provideError = document.getElementById('provideAddressError');
+    provideError.style.display = 'none';
 
-    if (!provideAddress) {
-      provideAddressError.textContent = "Please select Yes or No.";
-      provideAddressError.style.display = "block";
+    if (!provide) {
+      provideError.textContent = "Please select Yes or No.";
+      provideError.style.display = 'block';
       return;
     }
 
-    // If "Yes", validate all address fields
-    if (provideAddress === 'yes') {
-      const line1 = document.getElementById('address_line1');
-      const city = document.getElementById('city');
-      const state = document.getElementById('state');
-      const zip = document.getElementById('zip');
+    let valid = true;
 
-      const line1Error = document.getElementById('addressLine1Error');
-      const cityError = document.getElementById('cityError');
-      const stateError = document.getElementById('stateError');
-      const zipError = document.getElementById('zipError');
-
-      let valid = true;
+    if (provide === 'yes') {
+      // Validate full address
+      const line1        = document.getElementById('address_line1');
+      const line1Err     = document.getElementById('addressLine1Error');
+      const cityYes      = document.getElementById('city_yes');
+      const cityYesErr   = document.getElementById('cityYesError');
+      const stateField   = document.getElementById('state');
+      const stateErr     = document.getElementById('stateError');
+      const zipYes       = document.getElementById('zip_yes');
+      const zipYesErr    = document.getElementById('zipYesError');
 
       // Reset errors
-      line1Error.style.display = "none";
-      cityError.style.display = "none";
-      stateError.style.display = "none";
-      zipError.style.display = "none";
+      [line1Err, cityYesErr, stateErr, zipYesErr].forEach(e => e.style.display = 'none');
 
-      // Validate Address Line 1
       if (!line1.value.trim()) {
-        line1Error.textContent = "Address Line 1 is required.";
-        line1Error.style.display = "block";
+        line1Err.textContent = "Address Line 1 is required.";
+        line1Err.style.display = 'block';
         valid = false;
       }
 
-      // Validate City (letters and spaces only)
-      const cityPattern = /^[A-Za-z ]+$/;
-      if (!city.value.trim()) {
-        cityError.textContent = "City is required.";
-        cityError.style.display = "block";
-        valid = false;
-      } else if (!cityPattern.test(city.value.trim())) {
-        cityError.textContent = "City can only contain letters and spaces.";
-        cityError.style.display = "block";
+      if (!/^[A-Za-z ]+$/.test(cityYes.value.trim())) {
+        cityYesErr.textContent = "City can only contain letters and spaces.";
+        cityYesErr.style.display = 'block';
         valid = false;
       }
 
-      // Validate State (2 uppercase letters)
-      const statePattern = /^[A-Z]{2}$/;
-      const stateValue = state.value.trim().toUpperCase(); // Convert to uppercase
-      state.value = stateValue; // Update input to uppercase automatically
-
-      if (!stateValue) {
-        stateError.textContent = "State is required.";
-        stateError.style.display = "block";
-        valid = false;
-      } else if (!statePattern.test(stateValue)) {
-        stateError.textContent = "State must be exactly 2 letters (e.g., IL).";
-        stateError.style.display = "block";
+      const st = stateField.value.trim().toUpperCase();
+      stateField.value = st;
+      if (!/^[A-Z]{2}$/.test(st)) {
+        stateErr.textContent = "State must be exactly 2 letters.";
+        stateErr.style.display = 'block';
         valid = false;
       }
 
-      // Validate Zip (must be 5 digits)
-      const zipPattern = /^[0-9]{5}$/;
-      if (!zip.value.trim()) {
-        zipError.textContent = "Zip Code is required.";
-        zipError.style.display = "block";
-        valid = false;
-      } else if (!zipPattern.test(zip.value.trim())) {
-        zipError.textContent = "Enter a valid 5-digit Zip Code.";
-        zipError.style.display = "block";
+      if (!/^\d{5}$/.test(zipYes.value.trim())) {
+        zipYesErr.textContent = "Enter a valid 5-digit Zip Code.";
+        zipYesErr.style.display = 'block';
         valid = false;
       }
 
-      if (!valid) return; // Stop if validation fails
+      if (!valid) return;
     }
 
-    // If "No", validate County field
-    if (provideAddress === 'no') {
-      const countyField = document.getElementById('county');
-      const countyError = document.getElementById('countyError');
-      countyError.style.display = "none";
+    if (provide === 'no') {
+      // Validate city_no, zip_no
+      const cityNo    = document.getElementById('city_no');
+      const cityNoErr = document.getElementById('cityNoError');
+      const zipNo     = document.getElementById('zip_no');
+      const zipNoErr  = document.getElementById('zipNoError');
 
-      const countyPattern = /^[A-Za-z ]+$/;
-      if (!countyField.value.trim()) {
-        countyError.textContent = "Please enter the county.";
-        countyError.style.display = "block";
-        return;
-      } else if (!countyPattern.test(countyField.value.trim())) {
-        countyError.textContent = "County can only contain letters and spaces.";
-        countyError.style.display = "block";
-        return;
+      [cityNoErr, zipNoErr].forEach(e => e.style.display = 'none');
+
+      if (!/^[A-Za-z ]+$/.test(cityNo.value.trim())) {
+        cityNoErr.textContent = "City can only contain letters and spaces.";
+        cityNoErr.style.display = 'block';
+        valid = false;
       }
+      if (!/^\d{5}$/.test(zipNo.value.trim())) {
+        zipNoErr.textContent = "Enter a valid 5-digit Zip Code.";
+        zipNoErr.style.display = 'block';
+        valid = false;
+      }
+
+      if (!valid) return;
     }
 
     nextStep();
@@ -305,9 +290,9 @@ function updateProgressBar() {
 }
 
 function toggleBirthOrAgeField() {
-  const knowBirthdate = document.getElementById('know_birthdate').value;
-  document.getElementById('birthdateContainer').style.display = (knowBirthdate === 'yes') ? 'block' : 'none';
-  document.getElementById('ageContainer').style.display = (knowBirthdate === 'no') ? 'block' : 'none';
+  const know = document.getElementById('know_birthdate').value;
+  document.getElementById('birthdateContainer').style.display = (know === 'yes') ? 'block' : 'none';
+  document.getElementById('ageContainer')     .style.display = (know === 'no')  ? 'block' : 'none';
 }
 
 function toggleMedicaidField() {
@@ -317,16 +302,70 @@ function toggleMedicaidField() {
 }
 
 function toggleAddressOrCounty() {
-  const provideAddress = document.getElementById('provide_address').value;
-  document.getElementById('addressFields').style.display = (provideAddress === 'yes') ? 'block' : 'none';
-  document.getElementById('countyContainer').style.display = (provideAddress === 'no') ? 'block' : 'none';
+  const provide = document.getElementById('provide_address').value;
+
+  const yesGroup = document.querySelectorAll('#addressFields input');
+  const noGroup  = document.querySelectorAll('#countyCityZipContainer input');
+
+  if (provide === 'yes') {
+    // show full address, hide minimal
+    document.getElementById('addressFields').style.display = 'block';
+    document.getElementById('countyCityZipContainer').style.display = 'none';
+
+    // enable the Yes-fields, disable the No-fields
+    yesGroup.forEach(i => i.disabled = false);
+    noGroup .forEach(i => i.disabled = true);
+
+  } else if (provide === 'no') {
+    // show minimal, hide full
+    document.getElementById('addressFields').style.display = 'none';
+    document.getElementById('countyCityZipContainer').style.display = 'block';
+
+    // disable the Yes-fields, enable the No-fields
+    yesGroup.forEach(i => i.disabled = true);
+    noGroup .forEach(i => i.disabled = false);
+
+  } else {
+    // nothing selected yet
+    document.getElementById('addressFields').style.display = 'none';
+    document.getElementById('countyCityZipContainer').style.display = 'none';
+    yesGroup.forEach(i => i.disabled = true);
+    noGroup .forEach(i => i.disabled = true);
+  }
 }
 
 function restartForm() {
-  document.getElementById('leadForm').reset();
-  steps[currentStep].classList.remove('active');
+  const form = document.getElementById('leadForm');
+
+  // 1) Reset all form controls (inputs, selects, textareas)
+  form.reset();
+
+  // 2) Hide every conditional section
+  document.getElementById('birthdateContainer').style.display      = 'none';
+  document.getElementById('ageContainer').style.display            = 'none';
+  document.getElementById('medicaidNumberContainer').style.display = 'none';
+  document.getElementById('addressFields').style.display           = 'none';
+  document.getElementById('countyCityZipContainer').style.display    = 'none';
+
+  // 3) Clear all error text and hide them
+  document.querySelectorAll('.error-message, .error').forEach(el => {
+    el.textContent = '';
+    el.style.display = 'none';
+  });
+
+  // 4) Reset the submit button
+  const submitButton = form.querySelector('button[type="submit"]');
+  if (submitButton) {
+    submitButton.disabled = false;
+    submitButton.textContent = 'Submit';
+  }
+
+  // 5) Hide _all_ steps, then show step 0
+  steps.forEach(s => s.classList.remove('active'));
   currentStep = 0;
-  steps[currentStep].classList.add('active');
+  steps[0].classList.add('active');
+
+  // 6) Reset and redraw the progress bar
   updateProgressBar();
 }
 
