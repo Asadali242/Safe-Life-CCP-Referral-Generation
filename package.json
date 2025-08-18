@@ -1,26 +1,41 @@
 {
-    "name": "lead-form",
+    "name": "safe-life-ccp-referral-generation",
     "version": "1.0.0",
-    "dependencies": {
-        "node-fetch": "^3.3.2",
-        "twilio": "^5.8.0"
-    },
-    "description": "",
+    "private": true,
+    "description": "Safe Life CCP Referral Generation web form + Netlify Functions to fill and merge referral and consent PDFs.",
+    "type": "commonjs",
     "main": "script.js",
-    "devDependencies": {},
+    "engines": {
+      "node": ">=18"
+    },
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+      "dev": "netlify dev",
+      "start": "netlify dev",
+      "build": "echo \"Static site—no build step\"",
+      "test": "echo \"No tests configured\" && exit 0"
+    },
+    "dependencies": {
+      "nodemailer": "^6.9.14",
+      "pdf-lib": "^1.17.1",
+      "twilio": "^5.8.0"
     },
     "repository": {
-        "type": "git",
-        "url": "git+https://github.com/Asadali242/Safe-Life-CCP-Leads-Form-Web-Page.git"
+      "type": "git",
+      "url": "git+https://github.com/Asadali242/Safe-Life-CCP-Referral-Generation.git"
     },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
-    "type": "commonjs",
     "bugs": {
-        "url": "https://github.com/Asadali242/Safe-Life-CCP-Leads-Form-Web-Page/issues"
+      "url": "https://github.com/Asadali242/Safe-Life-CCP-Referral-Generation/issues"
     },
-    "homepage": "https://github.com/Asadali242/Safe-Life-CCP-Leads-Form-Web-Page#readme"
-}
+    "homepage": "https://github.com/Asadali242/Safe-Life-CCP-Referral-Generation#readme",
+    "keywords": [
+      "netlify",
+      "pdf-lib",
+      "referral",
+      "consent",
+      "form",
+      "email"
+    ],
+    "author": "Asad Mehboob Ali",
+    "license": "ISC"
+  }
+  

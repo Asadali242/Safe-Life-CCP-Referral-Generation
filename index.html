@@ -8,6 +8,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Safe Life Home Care Form</title>
   <link rel="stylesheet" href="style.css">
+
+  <!-- PDF-LIB for client-side PDF merging -->
+  <script defer src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js"></script>
+  <!-- Your app logic -->
   <script defer src="script.js"></script>
 </head>
 <body>
@@ -19,166 +23,488 @@
   <!-- Quote -->
   <div class="quote-container">
     Keeping You Home, Keeping You Safe!
-  </div>  
+  </div>
+
   <!-- Form Container -->
   <main class="container">
     <div class="progress-container">
       <div class="progress-bar" id="progressBar"></div>
     </div>
-    <p class="step-indicator" id="stepIndicator">Step 1 of 5</p>
+    <p class="step-indicator" id="stepIndicator">Step 1 of 10</p>
 
-    <h2>Safe Life Home Care Information Form</h2>
+    <h2>Illinois CCP Referral – Services & Supports</h2>
 
-    <form id="leadForm">
-      <!-- Step 1: Name -->
+    <form id="leadForm" novalidate>
+      <!-- STEP 1: Individual in Need -->
       <div class="step active">
-        <label>Your Name <span class="required-label">(required)</span></label>
-        <input type="text" name="name" id="name" placeholder="Enter your full name" required>
-        <p class="error-message" id="nameError"></p>
-        <button type="button" onclick="validateStep(0)">Next</button>
-      </div>
+        <h3 class="section-title">Individual in Need of Services & Supports</h3>
+        <p class="section-note">Demographic, contact, and living situation of the individual.</p>
 
-      <!-- Step 2: Relation -->
-      <div class="step">
-        <label>Your Relation with the Client <span class="required-label">(required)</span></label>
-        <input type="text" name="relation" id="relation" placeholder="e.g., Daughter, Friend" required>
-        <p class="error-message" id="relationError"></p>
+        <label>Name <span class="required-label">(required)</span></label>
+        <input type="text" name="individual_name" id="individual_name" required>
+        <p class="error-message" id="individual_nameError"></p>
+
+        <label>Date of Birth <span class="required-label">(required)</span></label>
+        <input type="date" name="individual_dob" id="individual_dob" required>
+        <p class="error-message" id="individual_dobError"></p>
+
+        <label>Address <span class="required-label">(required)</span></label>
+        <input type="text" name="individual_address" id="individual_address" placeholder="Street, Apt" required>
+        <p class="error-message" id="individual_addressError"></p>
+
+        <label>City <span class="required-label">(required)</span></label>
+        <input type="text" name="individual_city" id="individual_city" required>
+        <p class="error-message" id="individual_cityError"></p>
+
+        <label>Zip Code <span class="required-label">(required)</span></label>
+        <input type="text" name="individual_zip" id="individual_zip" required>
+        <p class="error-message" id="individual_zipError"></p>
+
+        <label>County <span class="required-label">(required)</span></label>
+        <input type="text" name="individual_county" id="individual_county" required>
+        <p class="error-message" id="individual_countyError"></p>
+
+        <label>Phone <span class="required-label">(required)</span></label>
+        <input type="tel" name="individual_phone" id="individual_phone" placeholder="123-456-7890" required>
+        <p class="error-message" id="individual_phoneError"></p>
+
+        <label>E-mail <span class="required-label">(required)</span></label>
+        <input type="email" name="individual_email" id="individual_email" placeholder="name@example.com" required>
+        <p class="error-message" id="individual_emailError"></p>
+
+        <label>Preferred Language (if not English)</label>
+        <input type="text" name="individual_pref_language" id="individual_pref_language" placeholder="e.g., Spanish">
+        <p class="error-message" id="individual_pref_languageError"></p>
+
+        <fieldset class="inline-fieldset" data-required-group="true">
+          <legend>Do you live alone? <span class="required-label">(required)</span></legend>
+          <label><input type="radio" name="individual_lives_alone" value="Yes"> Yes</label>
+          <label><input type="radio" name="individual_lives_alone" value="No"> No</label>
+        </fieldset>
+
+        <fieldset class="inline-fieldset" data-required-group="true">
+          <legend>Safety issues (e.g., dogs)? <span class="required-label">(required)</span></legend>
+          <label><input type="radio" name="individual_safety_issues" value="Yes"> Yes</label>
+          <label><input type="radio" name="individual_safety_issues" value="No"> No</label>
+        </fieldset>
+
+        <label>Please describe safety issues</label>
+        <textarea name="individual_safety_desc" id="individual_safety_desc" rows="3"></textarea>
+
+        <p class="error-message" id="step1Error"></p>
         <div class="button-group">
           <button type="button" class="back-btn" onclick="prevStep()">Back</button>
-          <button type="button" onclick="validateStep(1)">Next</button>
+          <button type="button" onclick="validateStep()">Next</button>
         </div>
       </div>
 
-      <!-- Step 3: Birthdate / Age -->
+      <!-- STEP 2: Facility (optional) -->
       <div class="step">
-        <label>Do you know the Birthdate of the Client? <span class="required-label">(required)</span></label>
-        <select name="know_birthdate" id="know_birthdate" onchange="toggleBirthOrAgeField()" required>
-          <option value="">-- Please select --</option>
-          <option value="yes">Yes</option>
-          <option value="no">No</option>
-        </select>
-        <p class="error-message" id="knowBirthdateError"></p>
+        <h3 class="section-title">Facility (if not home)</h3>
+        <p class="section-note">Complete if the individual is currently in a facility. Optional.</p>
 
-        <div id="birthdateContainer" style="display:none; margin-top: 20px;">
-          <label>Birthdate (mm/dd/yyyy)</label>
-          <input type="text" name="birthdate" id="birthdate" placeholder="mm/dd/yyyy">
-          <p class="error-message" id="birthdateError"></p>
-        </div>
+        <label>Facility Name</label>
+        <input type="text" name="facility_name" id="facility_name">
 
-        <div id="ageContainer" style="display:none; margin-top: 20px;">
-          <label>How old is the Client?</label>
-          <input type="number" name="age" id="age" placeholder="Enter age (in years)">
-          <p class="error-message" id="ageError"></p>
-        </div>
+        <label>Facility Address</label>
+        <input type="text" name="facility_address" id="facility_address">
 
+        <fieldset class="checkbox-fieldset">
+          <legend>Facility Type (select all that apply)</legend>
+          <div class="options options--onecol">
+            <label class="option">
+              <span class="option-text" title="Assisted Living">Assisted Living</span>
+              <input type="checkbox" name="facility_type" value="Assisted Living">
+            </label>
+            <label class="option">
+              <span class="option-text" title="Hospital">Hospital</span>
+              <input type="checkbox" name="facility_type" value="Hospital">
+            </label>
+            <label class="option">
+              <span class="option-text" title="Hospice Facility">Hospice Facility</span>
+              <input type="checkbox" name="facility_type" value="Hospice Facility">
+            </label>
+            <!-- special two-line option -->
+            <label class="option option--wrap">
+              <span class="option-text">
+                <span class="line">Long-term Care Facility</span>
+                <span class="line">(Nursing Home)</span>
+              </span>
+              <input type="checkbox" name="facility_type" value="Long-term Care Facility (Nursing Home)">
+            </label>
+            <label class="option">
+              <span class="option-text" title="Supportive Living Program">Supportive Living Program</span>
+              <input type="checkbox" name="facility_type" value="Supportive Living Program">
+            </label>
+            <label class="option">
+              <span class="option-text" title="Other">Other</span>
+              <input type="checkbox" name="facility_type" value="Other">
+            </label>
+          </div>
+        </fieldset>
+
+        <label>If Other, please specify</label>
+        <input type="text" name="facility_other_name" id="facility_other_name" placeholder="Facility type name">
+
+        <p class="error-message" id="step2Error"></p>
         <div class="button-group">
           <button type="button" class="back-btn" onclick="prevStep()">Back</button>
-          <button type="button" onclick="validateStep(2)">Next</button>
+          <button type="button" onclick="validateStep()">Next</button>
         </div>
       </div>
 
-      <!-- Step 4: Medicaid -->
+      <!-- STEP 3: Spouse & Caregiver -->
       <div class="step">
-        <label>Does the Client have Medicaid? <span class="required-label">(required)</span></label>
-        <select name="medicaid" id="medicaid" onchange="toggleMedicaidField()" required>
-          <option value="" disabled selected>-- Please select --</option>
-          <option value="yes">Yes</option>
-          <option value="no">No</option>
-        </select>
-        <span id="medicaidError" class="error-message" style="display:none;"></span>
-        <div id="medicaidNumberContainer" style="display:none; margin-top:20px;">
-          <label>Medicaid Number (if known)</label>
-          <input type="text" name="medicaid_number" placeholder="Enter Medicaid number">
-        </div>
+        <h3 class="section-title">Spouse & Caregiver</h3>
+        <p class="section-note">Spouse status and caregiver / emergency contact details.</p>
+
+        <fieldset class="inline-fieldset" data-required-group="true">
+          <legend>Does the individual have a spouse? <span class="required-label">(required)</span></legend>
+          <label><input type="radio" name="has_spouse" value="Yes"> Yes</label>
+          <label><input type="radio" name="has_spouse" value="No"> No</label>
+        </fieldset>
+
+        <label>If yes, Spouse Name</label>
+        <input type="text" name="spouse_name" id="spouse_name">
+
+        <fieldset class="inline-fieldset" data-required-group="true">
+          <legend>Is spouse in need of services? <span class="required-label">(required)</span></legend>
+          <label><input type="radio" name="spouse_needs_services" value="Yes"> Yes</label>
+          <label><input type="radio" name="spouse_needs_services" value="No"> No</label>
+        </fieldset>
+
+        <label>Age of spouse</label>
+        <input type="number" name="spouse_age" id="spouse_age" min="0">
+
+        <fieldset class="inline-fieldset" data-required-group="true">
+          <legend>Friend/family caregiver or emergency contact to contact? <span class="required-label">(required)</span></legend>
+          <label><input type="radio" name="has_caregiver" value="Yes"> Yes</label>
+          <label><input type="radio" name="has_caregiver" value="No"> No</label>
+        </fieldset>
+
+        <label>If yes, contact info</label>
+        <input type="text" name="caregiver_contact" id="caregiver_contact" placeholder="Name, phone, relationship">
+
+        <p class="error-message" id="step3Error"></p>
         <div class="button-group">
           <button type="button" class="back-btn" onclick="prevStep()">Back</button>
-          <button type="button" onclick="validateStep(3)">Next</button>
+          <button type="button" onclick="validateStep()">Next</button>
         </div>
       </div>
 
-      <!-- Step 5: Phone/Email -->
+      <!-- STEP 4: Representation -->
       <div class="step">
-        <label>Phone</label>
-        <input type="tel" name="phone" id="phone" placeholder="e.g., 123-456-7890">
-        <p class="error-message" id="phoneError"></p>
+        <h3 class="section-title">Representation</h3>
+        <p class="section-note">Legal guardian, representative payee, and power of attorney (POA).</p>
 
-        <label>Email</label>
-        <input type="email" name="email" id="email" placeholder="your@email.com">
-        <p class="error-message" id="emailError"></p>
+        <fieldset class="inline-fieldset" data-required-group="true">
+          <legend>Legal Guardian <span class="required-label">(required)</span></legend>
+          <label><input type="radio" name="legal_guardian" value="Yes"> Yes</label>
+          <label><input type="radio" name="legal_guardian" value="No"> No</label>
+          <label><input type="radio" name="legal_guardian" value="Unknown"> Unknown</label>
+        </fieldset>
 
-        <p class="required-label">Please enter either your Phone number or Email (or both).</p>
+        <fieldset class="inline-fieldset" data-required-group="true">
+          <legend>Representative Payee <span class="required-label">(required)</span></legend>
+          <label><input type="radio" name="representative_payee" value="Yes"> Yes</label>
+          <label><input type="radio" name="representative_payee" value="No"> No</label>
+          <label><input type="radio" name="representative_payee" value="Unknown"> Unknown</label>
+        </fieldset>
 
+        <fieldset class="inline-fieldset" data-required-group="true">
+          <legend>POA (Health) <span class="required-label">(required)</span></legend>
+          <label><input type="radio" name="poa_health" value="Yes"> Yes</label>
+          <label><input type="radio" name="poa_health" value="No"> No</label>
+          <label><input type="radio" name="poa_health" value="Unknown"> Unknown</label>
+        </fieldset>
+
+        <fieldset class="inline-fieldset" data-required-group="true">
+          <legend>POA (Financial) <span class="required-label">(required)</span></legend>
+          <label><input type="radio" name="poa_financial" value="Yes"> Yes</label>
+          <label><input type="radio" name="poa_financial" value="No"> No</label>
+          <label><input type="radio" name="poa_financial" value="Unknown"> Unknown</label>
+        </fieldset>
+
+        <label>Contact info for above (if known)</label>
+        <input type="text" name="rep_contact" id="rep_contact" placeholder="Guardian/POA/Payee contact details">
+
+        <p class="error-message" id="step4Error"></p>
         <div class="button-group">
           <button type="button" class="back-btn" onclick="prevStep()">Back</button>
-          <button type="button" onclick="validateStep(4)">Next</button>
+          <button type="button" onclick="validateStep()">Next</button>
         </div>
       </div>
 
-      <!-- Step 6: Address / County, City, Zip -->
+      <!-- STEP 5: Other Individual at Residence -->
       <div class="step">
-        <label for="provide_address">
-          Do you want to provide your Address?
+        <h3 class="section-title">Other Individual at Residence</h3>
+        <p class="section-note">Identify other residents who may need services.</p>
+
+        <fieldset class="inline-fieldset" data-required-group="true">
+          <legend>Any other individual that needs services? <span class="required-label">(required)</span></legend>
+          <label><input type="radio" name="other_person_exists" value="Yes"> Yes</label>
+          <label><input type="radio" name="other_person_exists" value="No"> No</label>
+        </fieldset>
+
+        <label>Name (if known)</label>
+        <input type="text" name="other_person_name" id="other_person_name">
+
+        <label>Age (if known)</label>
+        <input type="number" name="other_person_age" id="other_person_age" min="0">
+
+        <p class="error-message" id="step5Error"></p>
+        <div class="button-group">
+          <button type="button" class="back-btn" onclick="prevStep()">Back</button>
+          <button type="button" onclick="validateStep()">Next</button>
+        </div>
+      </div>
+
+      <!-- STEP 6: Health -->
+      <div class="step">
+        <h3 class="section-title">Health Information</h3>
+        <p class="section-note">Health conditions and preferred communication assistance.</p>
+
+        <fieldset class="inline-fieldset" data-required-group="true">
+          <legend>Hearing loss <span class="required-label">(required)</span></legend>
+          <label><input type="radio" name="hearing_loss" value="Yes"> Yes</label>
+          <label><input type="radio" name="hearing_loss" value="No"> No</label>
+          <label><input type="radio" name="hearing_loss" value="Unknown"> Unknown</label>
+        </fieldset>
+
+        <fieldset class="inline-fieldset" data-required-group="true">
+          <legend>Vision issues <span class="required-label">(required)</span></legend>
+          <label><input type="radio" name="vision_issues" value="Yes"> Yes</label>
+          <label><input type="radio" name="vision_issues" value="No"> No</label>
+          <label><input type="radio" name="vision_issues" value="Unknown"> Unknown</label>
+        </fieldset>
+
+        <fieldset class="inline-fieldset" data-required-group="true">
+          <legend>Alzheimer’s / Dementia <span class="required-label">(required)</span></legend>
+          <label><input type="radio" name="alz_dementia" value="Yes"> Yes</label>
+          <label><input type="radio" name="alz_dementia" value="No"> No</label>
+          <label><input type="radio" name="alz_dementia" value="Unknown"> Unknown</label>
+        </fieldset>
+
+        <fieldset class="inline-fieldset" data-required-group="true">
+          <legend>Mental Health Illness <span class="required-label">(required)</span></legend>
+          <label><input type="radio" name="mental_health" value="Yes"> Yes</label>
+          <label><input type="radio" name="mental_health" value="No"> No</label>
+          <label><input type="radio" name="mental_health" value="Unknown"> Unknown</label>
+        </fieldset>
+
+        <fieldset class="inline-fieldset" data-required-group="true">
+          <legend>Physical Disability <span class="required-label">(required)</span></legend>
+          <label><input type="radio" name="physical_disability" value="Yes"> Yes</label>
+          <label><input type="radio" name="physical_disability" value="No"> No</label>
+          <label><input type="radio" name="physical_disability" value="Unknown"> Unknown</label>
+        </fieldset>
+
+        <fieldset class="inline-fieldset" data-required-group="true">
+          <legend>Intellectual / Developmental Disability <span class="required-label">(required)</span></legend>
+          <label><input type="radio" name="intellectual_dev_disability" value="Yes"> Yes</label>
+          <label><input type="radio" name="intellectual_dev_disability" value="No"> No</label>
+          <label><input type="radio" name="intellectual_dev_disability" value="Unknown"> Unknown</label>
+        </fieldset>
+
+        <fieldset class="inline-fieldset" data-required-group="true">
+          <legend>Brain Injury (e.g., stroke, head injury, aneurysm) <span class="required-label">(required)</span></legend>
+          <label><input type="radio" name="brain_injury" value="Yes"> Yes</label>
+          <label><input type="radio" name="brain_injury" value="No"> No</label>
+          <label><input type="radio" name="brain_injury" value="Unknown"> Unknown</label>
+        </fieldset>
+
+        <label>Preferred method of communication (if needed)</label>
+        <input type="text" name="pref_comm_method" id="pref_comm_method" placeholder="Interpreter, TTY Relay, Braille, etc.">
+
+        <p class="error-message" id="step6Error"></p>
+        <div class="button-group">
+          <button type="button" class="back-btn" onclick="prevStep()">Back</button>
+          <button type="button" onclick="validateStep()">Next</button>
+        </div>
+      </div>
+
+      <!-- STEP 7: Current Services & Problems -->
+      <div class="step">
+        <h3 class="section-title">Current Services & Problems</h3>
+        <p class="section-note">Existing supports/services and any issues with them.</p>
+
+        <label for="reason_for_referral">
+          Reason for Referral (general concerns)
           <span class="required-label">(required)</span>
         </label>
-        <select name="provide_address" id="provide_address" required>
-          <option value="" disabled selected>-- Please select --</option>
-          <option value="yes">Yes</option>
-          <option value="no">No</option>
-        </select>
-        <span id="provideAddressError" class="error-message"></span>
+        <textarea id="reason_for_referral" name="reason_for_referral" rows="4" required
+                  placeholder="Briefly describe why the referral is being made and any urgent concerns."></textarea>
+        <p class="error-message" id="reason_for_referralError"></p>
 
-        <!-- If Yes: full address -->
-        <div id="addressFields" style="display:none; margin-top:20px;">
-          <label for="address_line1">Address Line 1 <span class="required-label">(required)</span></label>
-          <input type="text" id="address_line1" name="address_line1" placeholder="Enter address line 1">
-          <span id="addressLine1Error" class="error-message"></span>
+        <fieldset class="inline-fieldset" data-required-group="true">
+          <legend>Does the individual receive supports/services now? <span class="required-label">(required)</span></legend>
+          <label><input type="radio" name="receives_services" value="Yes"> Yes</label>
+          <label><input type="radio" name="receives_services" value="No"> No</label>
+        </fieldset>
 
-          <label for="address_line2">Address Line 2</label>
-          <input type="text" id="address_line2" name="address_line2" placeholder="Enter address line 2">
-          
-          <label for="city_yes">City <span class="required-label">(required)</span></label>
-          <input type="text" id="city_yes" name="city" placeholder="Enter city">
-          <span id="cityYesError" class="error-message"></span>
+        <label>If yes, what supports/services?</label>
+        <textarea name="types_services" id="types_services" rows="3"></textarea>
 
-          <label for="state">State <span class="required-label">(required)</span></label>
-          <input type="text" id="state" name="state" placeholder="State (e.g., IL)" maxlength="2">
-          <span id="stateError" class="error-message"></span>
+        <fieldset class="inline-fieldset" data-required-group="true">
+          <legend>Experiencing problems with current supports/services? <span class="required-label">(required)</span></legend>
+          <label><input type="radio" name="problems_with_services" value="Yes"> Yes</label>
+          <label><input type="radio" name="problems_with_services" value="No"> No</label>
+        </fieldset>
 
-          <label for="zip_yes">Zip Code <span class="required-label">(required)</span></label>
-          <input type="text" id="zip_yes" name="zip" placeholder="Enter zip code">
-          <span id="zipYesError" class="error-message"></span>
-        </div>
+        <label>Please explain problems</label>
+        <textarea name="problems_explain" id="problems_explain" rows="3"></textarea>
 
-        <!-- If No: minimal fields -->
-        <div id="countyCityZipContainer" style="display:none; margin-top:20px;">
-          <label for="city_no">Which City does the client live in? <span class="required-label">(required)</span></label>
-          <input type="text" id="city_no" name="city" placeholder="Enter city">
-          <span id="cityNoError" class="error-message"></span>
-
-          <label for="zip_no">Zip Code <span class="required-label">(required)</span></label>
-          <input type="text" id="zip_no" name="zip" placeholder="Enter zip code">
-          <span id="zipNoError" class="error-message"></span>
-        </div>
-
+        <p class="error-message" id="step7Error"></p>
         <div class="button-group">
           <button type="button" class="back-btn" onclick="prevStep()">Back</button>
-          <button type="button" onclick="validateStep(5)">Next</button>
+          <button type="button" onclick="validateStep()">Next</button>
         </div>
       </div>
 
-      <!-- Step 7: Additional Info -->
+      <!-- STEP 8: More Questions -->
       <div class="step">
-        <label>Any other related info</label>
-        <textarea name="info" rows="4" placeholder="If you want us to know anything else, please write it here"></textarea>
+        <h3 class="section-title">More Questions</h3>
+        <p class="section-note">Awareness, urgency, and preferences for the visit.</p>
+
+        <fieldset class="inline-fieldset" data-required-group="true">
+          <legend>Has the individual or spouse served in the military? <span class="required-label">(required)</span></legend>
+          <label><input type="radio" name="military_service" value="Yes"> Yes</label>
+          <label><input type="radio" name="military_service" value="No"> No</label>
+        </fieldset>
+
+        <fieldset class="inline-fieldset" data-required-group="true">
+          <legend>Is the individual aware of the referral? <span class="required-label">(required)</span></legend>
+          <label><input type="radio" name="aware_of_referral" value="Yes"> Yes</label>
+          <label><input type="radio" name="aware_of_referral" value="No"> No</label>
+          <label><input type="radio" name="aware_of_referral" value="Unknown"> Unknown</label>
+        </fieldset>
+
+        <fieldset class="inline-fieldset" data-required-group="true">
+          <legend>Is the individual in immediate danger? <span class="required-label">(required)</span></legend>
+          <label><input type="radio" name="immediate_danger" value="Yes"> Yes</label>
+          <label><input type="radio" name="immediate_danger" value="No"> No</label>
+          <label><input type="radio" name="immediate_danger" value="Unknown"> Unknown</label>
+        </fieldset>
+
+        <label>If yes, explain</label>
+        <textarea name="danger_explain" id="danger_explain" rows="3"></textarea>
+
+        <fieldset class="inline-fieldset" data-required-group="true">
+          <legend class="critical-question">
+            Is the individual in need of immediate assistance?
+            <span class="required-label">(required)</span>
+          </legend>
+          <label>
+            <input type="radio" name="immediate_assistance" value="Yes"> Yes
+          </label>
+          <label>
+            <input type="radio" name="immediate_assistance" value="No"> No
+          </label>
+          <p class="error-message"></p>
+        </fieldset>
+
+        <label for="assist_explain">If yes, please explain</label>
+        <textarea id="assist_explain" name="assist_explain" rows="3" placeholder="Describe the immediate need..."></textarea>
+
+        <fieldset class="inline-fieldset" data-required-group="true">
+          <legend>Does the individual want someone else present during the home visit? <span class="required-label">(required)</span></legend>
+          <label><input type="radio" name="wants_someone_present" value="Yes"> Yes</label>
+          <label><input type="radio" name="wants_someone_present" value="No"> No</label>
+        </fieldset>
+
+        <label>If yes, who?</label>
+        <input type="text" name="who_present" id="who_present">
+
+        <p class="error-message" id="step8Error"></p>
         <div class="button-group">
           <button type="button" class="back-btn" onclick="prevStep()">Back</button>
-          <button type="submit">Submit</button>
+          <button type="button" onclick="validateStep()">Next</button>
         </div>
       </div>
 
-      <!-- Thank You Step -->
+      <!-- ===== STEP 9: CONTACT PREFERENCES ===== -->
+      <div class="step" id="contactPrefsStep">
+        <h2>Best Way to Contact</h2>
+
+        <label for="best_time">
+          Best Time to Contact
+          <span class="required-label">(required)</span>
+        </label>
+        <input id="best_time" name="best_time" type="text" required placeholder="e.g., Weekdays 9am–12pm">
+        <p class="error-message" id="best_timeError"></p>
+
+        <label for="best_phone">
+          Best Phone
+          <span class="required-label">(required)</span>
+        </label>
+        <input id="best_phone" name="best_phone" type="tel" required placeholder="123-456-7890">
+        <p class="error-message" id="best_phoneError"></p>
+
+        <label for="best_email">
+          Best E-mail
+          <span class="required-label">(required)</span>
+        </label>
+        <input id="best_email" name="best_email" type="email" required placeholder="name@example.com">
+        <p class="error-message" id="best_emailError"></p>
+
+        <div class="button-group">
+          <button type="button" class="back-btn" onclick="prevStep()">Back</button>
+          <button type="button" onclick="validateStep()">Next</button>
+        </div>
+      </div>
+
+      <!-- STEP 10: Consent -->
+      <div class="step" id="consentStep">
+        <h3 class="section-title">Consent for Referral and Release</h3>
+        <p class="section-note">Please review the consent statement and provide signatures below.</p>
+
+        <div class="consent-text">
+          <p>
+            I authorize Safe Life Home Health Care to share information as needed to process this referral and coordinate
+            services. I understand this consent may be revoked in writing at any time, except to the extent that action
+            has already been taken in reliance on it. I acknowledge I have read and understand this authorization.
+          </p>
+        </div>
+
+        <label class="agree-line">
+          <input type="checkbox" id="consentAgree"> I have read and agree to the consent terms.
+        </label>
+        <p class="error-message" id="consentAgreeError"></p>
+
+        <div class="sig-section">
+          <div class="sig-block">
+            <div class="sig-label">Signature of the Person Giving Consent <span class="required-label">(required)</span></div>
+            <div class="signature-pad">
+              <canvas id="clientSignature" class="sig-canvas"></canvas>
+              <div class="sig-tools">
+                <button type="button" class="sig-clear" data-target="clientSignature">Clear</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="sig-block">
+            <div class="sig-label">Signature of the Agency Representative <span class="required-label">(required)</span></div>
+            <div class="signature-pad">
+              <canvas id="agencySignature" class="sig-canvas"></canvas>
+              <div class="sig-tools">
+                <button type="button" class="sig-clear" data-target="agencySignature">Clear</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="error-message" id="consentSigError"></p>
+
+        <div class="button-group">
+          <button type="button" class="back-btn" onclick="prevStep()">Back</button>
+          <button type="submit">Generate PDF</button>
+        </div>
+      </div>
+
+      <!-- STEP 11: Thank you -->
       <div class="step" id="thankYouStep">
-        <h3>Your responses have been recorded.<br>Thank you!</h3>
+        <h3>Thank you!</h3>
+        <p>Your filled PDF is being downloaded. If it didn’t start, please try again.</p>
         <button type="button" class="restart-btn" onclick="restartForm()">Start Another Response</button>
       </div>
     </form>
@@ -190,6 +516,5 @@
     <p>101 W 22<sup>nd</sup> St, STE 202, Lombard, IL 60148</p>
     <p>Ph: (855) 723-3440 | Fax: (630) 406-8342</p>
   </footer>
-
 </body>
 </html>

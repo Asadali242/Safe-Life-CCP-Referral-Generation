@@ -1,0 +1,25 @@
+name,type
+Medical Diagnosis,PDFTextField
+Type and Level of Service Needed,PDFTextField
+Reasons for Referral,PDFTextField
+Date,PDFTextField
+client_Telephone,PDFTextField
+client_Email,PDFTextField
+client_Address,PDFTextField
+client_Name,PDFTextField
+client_Cell,PDFTextField
+Physicians_Name,PDFTextField
+Physicians_Telephone,PDFTextField
+Physicians_Address,PDFTextField
+Caregiver_Name,PDFTextField
+Caregiver_Telephone,PDFTextField
+Caregiver_Cell,PDFTextField
+Emergency_Contact_Name,PDFTextField
+E_C_Telephone,PDFTextField
+E_C_Cell,PDFTextField
+Title of the Agency Representative,PDFTextField
+Signature Block70_es_:signer:signatureblock,PDFTextField
+Signature Block71_es_:signer:signatureblock,PDFTextField
+CCU_Name,PDFTextField
+CCU_contact,PDFTextField
+CCU_contact_2,PDFTextField

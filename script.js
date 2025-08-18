@@ -1,412 +1,652 @@
 let currentStep = 0;
 const steps = document.querySelectorAll('.step');
-const totalSteps = steps.length - 1; // Thank-you step excluded
+// Last step is the Thank You screen, so exclude it from progress math
+const totalSteps = steps.length - 1;
 
-// Initialize progress bar on page load
 document.addEventListener('DOMContentLoaded', () => {
   updateProgressBar();
+  initSignaturePad('clientSignature');
+  initSignaturePad('agencySignature');
 
-  // Re-attach conditional field logic on load
-  document.getElementById('know_birthdate').addEventListener('change', toggleBirthOrAgeField);
-  document.getElementById('provide_address').addEventListener('change', toggleAddressOrCounty);
-  toggleAddressOrCounty();
+  // Clear buttons
+  document.querySelectorAll('.sig-clear').forEach(btn => {
+    btn.addEventListener('click', () => clearSignature(btn.dataset.target));
+  });
+
+  // Live clear of field-level errors as the user types/selects
+  document.addEventListener('input', onFieldInput);
+  document.addEventListener('change', onFieldInput);
 });
 
-function validateStep(stepIndex) {
-  // Step 0: Name
-  if (stepIndex === 0) {
-    const nameField = document.getElementById('name');
-    const nameError = document.getElementById('nameError');
-    const nameValue = nameField.value.trim();
-    const nameRegex = /^[A-Za-z ]+$/; // Only letters and spaces
-
-    if (!nameValue) {
-      nameError.textContent = "Please enter your name.";
-      nameError.style.display = "block";
-      return;
-    } else if (!nameRegex.test(nameValue)) {
-      nameError.textContent = "Name can only contain letters and spaces.";
-      nameError.style.display = "block";
-      return;
-    } else {
-      nameError.style.display = "none";
-    }
-    nextStep();
-    return;
-  }
-
-  // Step 1: Relation
-  if (stepIndex === 1) {
-    const relationField = document.getElementById('relation');
-    const relationError = document.getElementById('relationError');
-    const relationValue = relationField.value.trim();
-    const relationRegex = /^[A-Za-z ]+$/; // Only letters and spaces
-
-    if (!relationValue) {
-      relationError.textContent = "Please enter your relation with the client.";
-      relationError.style.display = "block";
-      return;
-    } else if (!relationRegex.test(relationValue)) {
-      relationError.textContent = "Relation can only contain letters and spaces.";
-      relationError.style.display = "block";
-      return;
-    } else {
-      relationError.style.display = "none";
-    }
-    nextStep();
-    return;
-  }
-
-  // Step 2: Birth Date
-  if (stepIndex === 2) {
-    const knowBirthdate = document.getElementById('know_birthdate').value;
-    const knowBirthdateError = document.getElementById('knowBirthdateError');
-    knowBirthdateError.style.display = "none";
-  
-    if (!knowBirthdate) {
-      knowBirthdateError.textContent = "Please select Yes or No.";
-      knowBirthdateError.style.display = "block";
-      return;
-    }
-  
-    if (knowBirthdate === 'yes') {
-      const birthdateField = document.getElementById('birthdate');
-      const birthdateError = document.getElementById('birthdateError');
-      birthdateError.style.display = "none";
-      const value = birthdateField.value.trim();
-      const birthdatePattern = /^(0[1-9]|1[0-2])\/(0[1-9]|[12][0-9]|3[01])\/(19|20)\d{2}$/;
-  
-      if (!value) {
-        birthdateError.textContent = "Please enter the birthdate.";
-        birthdateError.style.display = "block";
-        return;
-      } else if (!birthdatePattern.test(value)) {
-        birthdateError.textContent = "Enter a valid date in mm/dd/yyyy format.";
-        birthdateError.style.display = "block";
-        return;
-      }
-    } else if (knowBirthdate === 'no') {
-      const ageField = document.getElementById('age');
-      const ageError = document.getElementById('ageError');
-      ageError.style.display = "none";
-  
-      if (!ageField.value.trim()) {
-        ageError.textContent = "Please enter the client's age.";
-        ageError.style.display = "block";
-        return;
-      } else if (isNaN(ageField.value.trim()) || ageField.value.trim() <= 0 || ageField.value.trim() > 120) {
-        ageError.textContent = "Enter a valid age (1–120).";
-        ageError.style.display = "block";
-        return;
-      }
-    }
-  
-    nextStep();
-    return;
-  }
-  
-  // Step 3: Medicaid
-  if (stepIndex === 3) {
-    const medicaidDropdown = document.getElementById('medicaid');
-    const medicaidError    = document.getElementById('medicaidError');
-    medicaidError.style.display = "none";
-
-    if (!medicaidDropdown.value) {
-      medicaidError.textContent = "Please select Yes or No.";
-      medicaidError.style.display = "block";
-      return;
-    }
-
-    nextStep();
-    return;
-  }
-
-  // Step 4: Phone/Email
-  if (stepIndex === 4) {
-    const phoneField = document.getElementById('phone');
-    const emailField = document.getElementById('email');
-    const phoneError = document.getElementById('phoneError');
-    const emailError = document.getElementById('emailError');
-    if (!phoneField || !emailField) return;
-
-    // Reset errors
-    phoneError.style.display = "none";
-    emailError.style.display = "none";
-
-    // Check at least one contact is filled
-    if (!phoneField.value.trim() && !emailField.value.trim()) {
-      phoneError.textContent = "Please provide at least Phone or Email.";
-      phoneError.style.display = "block";
-      return;
-    }
-
-    // Validate phone number format
-    if (phoneField.value.trim()) {
-      const phoneValue = phoneField.value.trim();
-      const plainDigits = /^[0-9]{10}$/;            // 10 digits, no dashes
-      const dashedFormat = /^[0-9]{3}-[0-9]{3}-[0-9]{4}$/; // 123-456-7890
-
-      if (!plainDigits.test(phoneValue) && !dashedFormat.test(phoneValue)) {
-        phoneError.textContent = "Please enter a valid phone (1234567890 or 123-456-7890).";
-        phoneError.style.display = "block";
-        return;
-      }
-    }
-
-    // Validate email
-    if (emailField.value.trim() && !/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(emailField.value.trim())) {
-      emailError.textContent = "Please enter a valid email address.";
-      emailError.style.display = "block";
-      return;
-    }
-    nextStep();
-    return;
-  }
-
-  // Step 5: Address Question + Fields
-  if (stepIndex === 5) {
-    const provide      = document.getElementById('provide_address').value;
-    const provideError = document.getElementById('provideAddressError');
-    provideError.style.display = 'none';
-
-    if (!provide) {
-      provideError.textContent = "Please select Yes or No.";
-      provideError.style.display = 'block';
-      return;
-    }
-
-    let valid = true;
-
-    if (provide === 'yes') {
-      // Validate full address
-      const line1        = document.getElementById('address_line1');
-      const line1Err     = document.getElementById('addressLine1Error');
-      const cityYes      = document.getElementById('city_yes');
-      const cityYesErr   = document.getElementById('cityYesError');
-      const stateField   = document.getElementById('state');
-      const stateErr     = document.getElementById('stateError');
-      const zipYes       = document.getElementById('zip_yes');
-      const zipYesErr    = document.getElementById('zipYesError');
-
-      // Reset errors
-      [line1Err, cityYesErr, stateErr, zipYesErr].forEach(e => e.style.display = 'none');
-
-      if (!line1.value.trim()) {
-        line1Err.textContent = "Address Line 1 is required.";
-        line1Err.style.display = 'block';
-        valid = false;
-      }
-
-      if (!/^[A-Za-z ]+$/.test(cityYes.value.trim())) {
-        cityYesErr.textContent = "City can only contain letters and spaces.";
-        cityYesErr.style.display = 'block';
-        valid = false;
-      }
-
-      const st = stateField.value.trim().toUpperCase();
-      stateField.value = st;
-      if (!/^[A-Z]{2}$/.test(st)) {
-        stateErr.textContent = "State must be exactly 2 letters.";
-        stateErr.style.display = 'block';
-        valid = false;
-      }
-
-      if (!/^\d{5}$/.test(zipYes.value.trim())) {
-        zipYesErr.textContent = "Enter a valid 5-digit Zip Code.";
-        zipYesErr.style.display = 'block';
-        valid = false;
-      }
-
-      if (!valid) return;
-    }
-
-    if (provide === 'no') {
-      // Validate city_no, zip_no
-      const cityNo    = document.getElementById('city_no');
-      const cityNoErr = document.getElementById('cityNoError');
-      const zipNo     = document.getElementById('zip_no');
-      const zipNoErr  = document.getElementById('zipNoError');
-
-      [cityNoErr, zipNoErr].forEach(e => e.style.display = 'none');
-
-      if (!/^[A-Za-z ]+$/.test(cityNo.value.trim())) {
-        cityNoErr.textContent = "City can only contain letters and spaces.";
-        cityNoErr.style.display = 'block';
-        valid = false;
-      }
-      if (!/^\d{5}$/.test(zipNo.value.trim())) {
-        zipNoErr.textContent = "Enter a valid 5-digit Zip Code.";
-        zipNoErr.style.display = 'block';
-        valid = false;
-      }
-
-      if (!valid) return;
-    }
-
-    nextStep();
-    return;
-  }
-
-  // Step 6: Additional Info (No validation needed)
-  if (stepIndex === 6) {
-    nextStep();
-    return;
-  }
-}
-
-// Move to the next step
+// ---------- Navigation & Progress ----------
 function nextStep() {
   if (currentStep < totalSteps) {
     steps[currentStep].classList.remove('active');
     currentStep++;
     steps[currentStep].classList.add('active');
+    onStepActivated(currentStep);
     updateProgressBar();
+    window.scrollTo({ top: steps[currentStep].offsetTop - 24, behavior: 'smooth' });
   }
 }
-
-// Move to the previous step
 function prevStep() {
   if (currentStep > 0) {
     steps[currentStep].classList.remove('active');
     currentStep--;
     steps[currentStep].classList.add('active');
+    onStepActivated(currentStep);
     updateProgressBar();
+    window.scrollTo({ top: steps[currentStep].offsetTop - 24, behavior: 'smooth' });
   }
 }
-
-// Update the progress bar and step indicator
+function onStepActivated(idx) {
+  const section = steps[idx];
+  // Ensure canvases get sized once visible
+  if (section && section.id === 'consentStep') {
+    signaturePads.clientSignature?.ensureVisibleSize?.();
+    signaturePads.agencySignature?.ensureVisibleSize?.();
+  }
+}
 function updateProgressBar() {
-  const progressBar = document.getElementById('progressBar');
-  const stepIndicator = document.getElementById('stepIndicator');
+  const bar = document.getElementById('progressBar');
+  const label = document.getElementById('stepIndicator');
+  if (!bar || !label) return;
 
-  if (currentStep >= totalSteps) {
-    progressBar.style.width = `100%`;
-    stepIndicator.textContent = `Step ${totalSteps} of ${totalSteps}`;
-  } else {
-    const progress = (currentStep / totalSteps) * 100;
-    progressBar.style.width = `${progress}%`;
-    stepIndicator.textContent = `Step ${currentStep + 1} of ${totalSteps}`;
+  const pct = currentStep >= totalSteps ? 100 : (currentStep / totalSteps) * 100;
+  bar.style.width = `${pct}%`;
+  label.textContent = `Step ${Math.min(currentStep + 1, totalSteps)} of ${totalSteps}`;
+}
+
+// ---------- Inline error helpers ----------
+function getOrCreateFieldErrorEl(el) {
+  // If there is already an immediate sibling error <p>, reuse it
+  const next = el.nextElementSibling;
+  if (next && next.classList && next.classList.contains('error-message')) return next;
+
+  // Otherwise, create a new inline error block right after the field
+  const p = document.createElement('p');
+  p.className = 'error-message';
+  p.id = (el.id ? `${el.id}Error` : `${el.name || 'field'}Error`);
+  el.insertAdjacentElement('afterend', p);
+  return p;
+}
+function showFieldError(el, msg) {
+  const err = getOrCreateFieldErrorEl(el);
+  err.textContent = msg;
+  err.style.display = 'block';
+  el.setAttribute('aria-invalid', 'true');
+}
+function clearFieldError(el) {
+  if (!el) return;
+  // Prefer the sibling error if present
+  const sib = el.nextElementSibling;
+  const err = (sib && sib.classList?.contains('error-message'))
+    ? sib
+    : document.getElementById((el.id || el.name || 'field') + 'Error');
+  if (err) { err.textContent = ''; err.style.display = 'none'; }
+  el.removeAttribute('aria-invalid');
+}
+
+function getOrCreateGroupErrorEl(fs) {
+  let err = fs.querySelector(':scope > .error-message');
+  if (!err) {
+    err = document.createElement('p');
+    err.className = 'error-message';
+    fs.appendChild(err);
+  }
+  return err;
+}
+function showGroupError(fs, msg) {
+  const err = getOrCreateGroupErrorEl(fs);
+  err.textContent = msg;
+  err.style.display = 'block';
+  fs.setAttribute('aria-invalid', 'true');
+}
+function clearGroupError(fs) {
+  const err = fs.querySelector(':scope > .error-message');
+  if (err) { err.textContent = ''; err.style.display = 'none'; }
+  fs.removeAttribute('aria-invalid');
+}
+
+// When user types/selects, clear any inline error for that control or its required group
+function onFieldInput(e) {
+  const el = e.target;
+  if (!el) return;
+
+  // Clear field-level error
+  if (['INPUT', 'SELECT', 'TEXTAREA'].includes(el.tagName)) {
+    clearFieldError(el);
+  }
+
+  // If part of a required radio/checkbox group, clear the group error once any is checked
+  const fs = el.closest('fieldset[data-required-group="true"]');
+  if (fs) {
+    const anyChecked = fs.querySelector('input[type="radio"]:checked, input[type="checkbox"]:checked');
+    if (anyChecked) clearGroupError(fs);
   }
 }
 
-function toggleBirthOrAgeField() {
-  const know = document.getElementById('know_birthdate').value;
-  document.getElementById('birthdateContainer').style.display = (know === 'yes') ? 'block' : 'none';
-  document.getElementById('ageContainer')     .style.display = (know === 'no')  ? 'block' : 'none';
+// ---------- Validation helpers ----------
+function isPastDateISO(value) {
+  const d = new Date(value);
+  if (isNaN(d.getTime())) return false;
+  const today = new Date(); today.setHours(0,0,0,0);
+  return d < today;
+}
+function yearsBetweenISOToToday(dobISO) {
+  const d = new Date(dobISO);
+  if (isNaN(d.getTime())) return null;
+  const t = new Date();
+  let y = t.getFullYear() - d.getFullYear();
+  const m = t.getMonth() - d.getMonth();
+  if (m < 0 || (m === 0 && t.getDate() < d.getDate())) y--;
+  return y;
 }
 
-function toggleMedicaidField() {
-  const medicaid = document.getElementById('medicaid').value;
-  const medicaidContainer = document.getElementById('medicaidNumberContainer');
-  medicaidContainer.style.display = (medicaid === 'yes') ? 'block' : 'none';
-}
+// ---------- Signature Pads ----------
+const signaturePads = {}; // { id: { canvas, ctx, dpr, drawing, lastX, lastY, hasInk, resize, ensureVisibleSize } }
 
-function toggleAddressOrCounty() {
-  const provide = document.getElementById('provide_address').value;
+function initSignaturePad(id) {
+  const canvas = document.getElementById(id);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
 
-  const yesGroup = document.querySelectorAll('#addressFields input');
-  const noGroup  = document.querySelectorAll('#countyCityZipContainer input');
-
-  if (provide === 'yes') {
-    // show full address, hide minimal
-    document.getElementById('addressFields').style.display = 'block';
-    document.getElementById('countyCityZipContainer').style.display = 'none';
-
-    // enable the Yes-fields, disable the No-fields
-    yesGroup.forEach(i => i.disabled = false);
-    noGroup .forEach(i => i.disabled = true);
-
-  } else if (provide === 'no') {
-    // show minimal, hide full
-    document.getElementById('addressFields').style.display = 'none';
-    document.getElementById('countyCityZipContainer').style.display = 'block';
-
-    // disable the Yes-fields, enable the No-fields
-    yesGroup.forEach(i => i.disabled = true);
-    noGroup .forEach(i => i.disabled = false);
-
-  } else {
-    // nothing selected yet
-    document.getElementById('addressFields').style.display = 'none';
-    document.getElementById('countyCityZipContainer').style.display = 'none';
-    yesGroup.forEach(i => i.disabled = true);
-    noGroup .forEach(i => i.disabled = true);
+  function sizeToVisibleRect() {
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return false; // hidden
+    const needW = Math.round(rect.width * dpr);
+    const needH = Math.round(rect.height * dpr);
+    if (canvas.width !== needW || canvas.height !== needH) {
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      canvas.width = needW;
+      canvas.height = needH;
+      ctx.scale(dpr, dpr);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      signaturePads[id].hasInk = false;
+    }
+    return true;
   }
+
+  function resize() { sizeToVisibleRect(); }
+  function ensureVisibleSize() { sizeToVisibleRect(); }
+
+  signaturePads[id] = {
+    canvas, ctx, dpr,
+    drawing: false, lastX: 0, lastY: 0,
+    hasInk: false,
+    resize, ensureVisibleSize
+  };
+
+  // Initial sizing attempt (will no-op if hidden)
+  resize();
+  window.addEventListener('resize', resize);
+
+  const start = (x, y) => {
+    const s = signaturePads[id];
+    s.ensureVisibleSize(); // make sure the canvas is sized once visible
+    s.drawing = true;
+    s.lastX = x;
+    s.lastY = y;
+  };
+  const move = (x, y) => {
+    const s = signaturePads[id];
+    if (!s.drawing) return;
+    s.hasInk = true;
+    s.ctx.lineCap = 'round';
+    s.ctx.lineJoin = 'round';
+    s.ctx.strokeStyle = '#0d4052';
+    s.ctx.lineWidth = 2.2;
+    s.ctx.beginPath();
+    s.ctx.moveTo(s.lastX, s.lastY);
+    s.ctx.lineTo(x, y);
+    s.ctx.stroke();
+    s.lastX = x;
+    s.lastY = y;
+  };
+  const end = () => signaturePads[id].drawing = false;
+
+  // Mouse
+  canvas.addEventListener('mousedown', e => start(e.offsetX, e.offsetY));
+  canvas.addEventListener('mousemove', e => move(e.offsetX, e.offsetY));
+  canvas.addEventListener('mouseup', end);
+  canvas.addEventListener('mouseleave', end);
+
+  // Touch
+  canvas.addEventListener('touchstart', e => {
+    e.preventDefault();
+    const r = canvas.getBoundingClientRect();
+    const t = e.touches[0];
+    start(t.clientX - r.left, t.clientY - r.top);
+  }, { passive: false });
+  canvas.addEventListener('touchmove', e => {
+    e.preventDefault();
+    const r = canvas.getBoundingClientRect();
+    const t = e.touches[0];
+    move(t.clientX - r.left, t.clientY - r.top);
+  }, { passive: false });
+  canvas.addEventListener('touchend', end);
 }
 
-function restartForm() {
-  const form = document.getElementById('leadForm');
+function clearSignature(id) {
+  const s = signaturePads[id];
+  if (!s) return;
+  s.ctx.setTransform(1,0,0,1,0,0);
+  s.ctx.clearRect(0, 0, s.canvas.width, s.canvas.height);
+  s.hasInk = false;
+  s.ctx.scale(s.dpr, s.dpr);
+}
 
-  // 1) Reset all form controls (inputs, selects, textareas)
-  form.reset();
+function signatureDataUrl(id) {
+  const s = signaturePads[id];
+  if (!s) return '';
+  return s.canvas.toDataURL('image/png');
+}
 
-  // 2) Hide every conditional section
-  document.getElementById('birthdateContainer').style.display      = 'none';
-  document.getElementById('ageContainer').style.display            = 'none';
-  document.getElementById('medicaidNumberContainer').style.display = 'none';
-  document.getElementById('addressFields').style.display           = 'none';
-  document.getElementById('countyCityZipContainer').style.display    = 'none';
+// ---------- Step Validation (INLINE) ----------
+function validateStep() {
+  const section = steps[currentStep];
 
-  // 3) Clear all error text and hide them
-  document.querySelectorAll('.error-message, .error').forEach(el => {
-    el.textContent = '';
-    el.style.display = 'none';
+  // Track first invalid control to focus it
+  let firstInvalid = null;
+
+  // 1) Required single inputs/selects/textareas in this step
+  const required = Array.from(section.querySelectorAll('input[required], select[required], textarea[required]'));
+  required.forEach(el => {
+    const v = (el.value || '').trim();
+    if (!v) {
+      if (!firstInvalid) firstInvalid = el;
+      showFieldError(el, 'This field is required.');
+    }
   });
 
-  // 4) Reset the submit button
-  const submitButton = form.querySelector('button[type="submit"]');
-  if (submitButton) {
-    submitButton.disabled = false;
-    submitButton.textContent = 'Submit';
+  // 2) Required radio/checkbox groups
+  const groups = Array.from(section.querySelectorAll('fieldset[data-required-group="true"]'));
+  groups.forEach(fs => {
+    const anyChecked = fs.querySelector('input[type="radio"]:checked, input[type="checkbox"]:checked');
+    if (!anyChecked) {
+      if (!firstInvalid) {
+        const firstControl = fs.querySelector('input');
+        firstInvalid = firstControl || fs;
+      }
+      showGroupError(fs, 'Please make a selection.');
+    }
+  });
+
+  // 3) Pattern & logic validations for this step only
+  if (currentStep === 0) {
+    // DOB
+    const dobEl = document.getElementById('individual_dob');
+    if (dobEl) {
+      const dob = dobEl.value;
+      if (!dob || !isPastDateISO(dob)) {
+        if (!firstInvalid) firstInvalid = dobEl;
+        showFieldError(dobEl, 'Date of birth must be a valid past date.');
+      }
+    }
+
+    // Address
+    const addrEl = document.getElementById('individual_address');
+    if (addrEl && addrEl.value.trim().length < 5) {
+      if (!firstInvalid) firstInvalid = addrEl;
+      showFieldError(addrEl, 'Please enter a full street address.');
+    }
+
+    // City
+    const cityEl = document.getElementById('individual_city');
+    if (cityEl && !/^[A-Za-z .'-]{2,}$/.test(cityEl.value.trim())) {
+      if (!firstInvalid) firstInvalid = cityEl;
+      showFieldError(cityEl, 'Enter a valid city name.');
+    }
+
+    // ZIP
+    const zipEl = document.getElementById('individual_zip');
+    if (zipEl && !/^\d{5}(-\d{4})?$/.test(zipEl.value.trim())) {
+      if (!firstInvalid) firstInvalid = zipEl;
+      showFieldError(zipEl, 'Enter a valid ZIP (12345 or 12345-6789).');
+    }
+
+    // County
+    const countyEl = document.getElementById('individual_county');
+    if (countyEl && !/^[A-Za-z .'-]{2,}$/.test(countyEl.value.trim())) {
+      if (!firstInvalid) firstInvalid = countyEl;
+      showFieldError(countyEl, 'Enter a valid county.');
+    }
+
+    // Phone
+    const phoneEl = document.getElementById('individual_phone');
+    if (phoneEl && !/^\d{10}$|^\d{3}-\d{3}-\d{4}$/.test(phoneEl.value.trim())) {
+      if (!firstInvalid) firstInvalid = phoneEl;
+      showFieldError(phoneEl, 'Use 1234567890 or 123-456-7890.');
+    }
+
+    // Email
+    const emailEl = document.getElementById('individual_email');
+    if (emailEl && !/^[\w-.]+@([\w-]+\.)+[\w-]{2,}$/i.test(emailEl.value.trim())) {
+      if (!firstInvalid) firstInvalid = emailEl;
+      showFieldError(emailEl, 'Enter a valid email address.');
+    }
   }
 
-  // 5) Hide _all_ steps, then show step 0
-  steps.forEach(s => s.classList.remove('active'));
-  currentStep = 0;
-  steps[0].classList.add('active');
+  // Consent step specifics
+  if (section.id === 'consentStep') {
+    const agree = document.getElementById('consentAgree');
+    const agreeErr = document.getElementById('consentAgreeError');
+    const sigErr = document.getElementById('consentSigError');
+    if (agreeErr) { agreeErr.textContent = ''; agreeErr.style.display = 'none'; }
+    if (sigErr) { sigErr.textContent = ''; sigErr.style.display = 'none'; }
 
-  // 6) Reset and redraw the progress bar
-  updateProgressBar();
+    if (!agree.checked) {
+      if (!firstInvalid) firstInvalid = agree;
+      agreeErr.textContent = 'Please confirm you agree to the consent terms.';
+      agreeErr.style.display = 'block';
+    }
+    if (!signaturePads.clientSignature?.hasInk || !signaturePads.agencySignature?.hasInk) {
+      sigErr.textContent = 'Please provide both signatures before submitting.';
+      sigErr.style.display = 'block';
+      if (!firstInvalid) firstInvalid = document.getElementById('clientSignature');
+    }
+  }
+
+  // If anything invalid, focus and stop
+  if (firstInvalid) {
+    // Try to focus the control
+    if (firstInvalid.focus) firstInvalid.focus();
+    // Scroll it into view nicely
+    const y = firstInvalid.getBoundingClientRect().top + window.scrollY - 100;
+    window.scrollTo({ top: y, behavior: 'smooth' });
+    return false;
+  }
+
+  nextStep();
+  return true;
 }
 
-// Handle form submission
+// ---------- Payload Helpers ----------
+function getRadio(name) {
+  const checked = document.querySelector(`input[name="${name}"]:checked`);
+  return checked ? checked.value : '';
+}
+function getCheckboxGroup(name) {
+  return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(el => el.value);
+}
+function val(id) {
+  const el = document.getElementById(id);
+  return el ? (el.value || '') : '';
+}
+
+function formatLocalDateMMDDYYYY(d) {
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  const yyyy = d.getFullYear();
+  return `${mm}/${dd}/${yyyy}`;
+}
+function formatISOToMMDDYYYY(iso) {
+  if (!iso) return '';
+  const [yyyy, mm, dd] = iso.split('-');
+  if (!yyyy || !mm || !dd) return '';
+  return `${mm.padStart(2, '0')}/${dd.padStart(2, '0')}/${yyyy}`;
+}
+function formatLocalTimeHHMM(d) {
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mm = String(d.getMinutes()).padStart(2, '0');
+  return `${hh}:${mm}`;
+}
+function yearsBetweenISO(dobISO) {
+  const y = yearsBetweenISOToToday(dobISO);
+  return (y == null || y < 0 || y > 120) ? '' : String(y);
+}
+
+function buildPayload() {
+  const now = new Date();
+  const autoReferralDate = formatLocalDateMMDDYYYY(now); // MM/DD/YYYY
+  const autoReferralTime = formatLocalTimeHHMM(now);      // HH:MM
+
+  const dobISO = val('individual_dob');
+  const dobMMDDYYYY = formatISOToMMDDYYYY(dobISO);
+  const computedAge = yearsBetweenISO(dobISO);            // auto age
+
+  // Signature data URLs
+  const clientSig = signatureDataUrl('clientSignature');
+  const agencySig = signatureDataUrl('agencySignature');
+
+  return {
+    // Header (auto)
+    referral_date: autoReferralDate,
+    referral_time: autoReferralTime,
+    agency_name: "Safe Life Home Health Care",
+    staff_person: "Intake Team",
+
+    // Referrer (auto)
+    referrer_name: "Rai Faisal Aslam",
+    referrer_phone: "224-344-3977",
+    referrer_phone_type: "Cell",
+    referrer_email: "faisal.safelife@gmail.com",
+    referrer_relationship: "Home Care Provider Agency",
+
+    // Individual (first visible step)
+    individual_name: val('individual_name'),
+    individual_age: computedAge,          // auto-filled age (no form field)
+    individual_dob: dobMMDDYYYY,          // MM/DD/YYYY
+    individual_address: val('individual_address'),
+    individual_city: val('individual_city'),
+    individual_zip: val('individual_zip'),
+    individual_county: val('individual_county'),
+    individual_phone: val('individual_phone'),
+    individual_email: val('individual_email'),
+    individual_pref_language: val('individual_pref_language'),
+    individual_lives_alone: getRadio('individual_lives_alone'),
+    individual_safety_issues: getRadio('individual_safety_issues'),
+    individual_safety_desc: val('individual_safety_desc'),
+
+    // Facility (optional)
+    facility_name: val('facility_name'),
+    facility_address: val('facility_address'),
+    facility_type: getCheckboxGroup('facility_type'),
+    facility_other_name: val('facility_other_name'),
+
+    // Spouse & Caregiver
+    has_spouse: getRadio('has_spouse'),
+    spouse_name: val('spouse_name'),
+    spouse_needs_services: getRadio('spouse_needs_services'),
+    spouse_age: val('spouse_age'),
+    has_caregiver: getRadio('has_caregiver'),
+    caregiver_contact: val('caregiver_contact'),
+
+    // Representation
+    legal_guardian: getRadio('legal_guardian'),
+    representative_payee: getRadio('representative_payee'),
+    poa_health: getRadio('poa_health'),
+    poa_financial: getRadio('poa_financial'),
+    rep_contact: val('rep_contact'),
+
+    // Other
+    other_person_exists: getRadio('other_person_exists'),
+    other_person_name: val('other_person_name'),
+    other_person_age: val('other_person_age'),
+
+    // Health
+    hearing_loss: getRadio('hearing_loss'),
+    vision_issues: getRadio('vision_issues'),
+    alz_dementia: getRadio('alz_dementia'),
+    mental_health: getRadio('mental_health'),
+    physical_disability: getRadio('physical_disability'),
+    intellectual_dev_disability: getRadio('intellectual_dev_disability'),
+    brain_injury: getRadio('brain_injury'),
+    pref_comm_method: val('pref_comm_method'),
+
+    // Services & Problems
+    reason_for_referral: val('reason_for_referral'),
+    receives_services: getRadio('receives_services'),
+    types_services: val('types_services'),
+    problems_with_services: getRadio('problems_with_services'),
+    problems_explain: val('problems_explain'),
+
+    // More Questions
+    military_service: getRadio('military_service'),
+    aware_of_referral: getRadio('aware_of_referral'),
+    immediate_danger: getRadio('immediate_danger'),
+    danger_explain: val('danger_explain'),
+    immediate_assistance: getRadio('immediate_assistance'),
+    assist_explain: val('assist_explain'),
+    wants_someone_present: getRadio('wants_someone_present'),
+    who_present: val('who_present'),
+
+    // Contact
+    best_time: val('best_time'),
+    best_phone: val('best_phone'),
+    best_email: val('best_email'),
+
+    // Consent
+    consent_agree: document.getElementById('consentAgree')?.checked || false,
+    consent_client_signature: clientSig,
+    consent_agency_signature: agencySig,
+  };
+}
+
+// ---------- PDF & Email Helpers ----------
+
+// POST to Netlify functions to generate PDFs
+async function fetchPdf(functionName, payload) {
+  const res = await fetch(`/.netlify/functions/${functionName}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error(`${functionName} responded ${res.status}`);
+  return await res.blob();
+}
+function sanitizeFileName(name) {
+  if (!name) return 'Referral_Form';
+  return name.replace(/[\\/:*?"<>|]+/g, '').trim().replace(/\s+/g, '_');
+}
+
+// Merge both PDFs into a single Uint8Array (bytes)
+async function combinePdfsToBytes(referralBlob, consentBlob) {
+  const { PDFDocument } = window.PDFLib;
+  const [refArr, conArr] = await Promise.all([referralBlob.arrayBuffer(), consentBlob.arrayBuffer()]);
+  const [refDoc, conDoc] = await Promise.all([PDFDocument.load(refArr), PDFDocument.load(conArr)]);
+  const outDoc = await PDFDocument.create();
+
+  const refPages = await outDoc.copyPages(refDoc, refDoc.getPageIndices());
+  refPages.forEach(p => outDoc.addPage(p));
+  const conPages = await outDoc.copyPages(conDoc, conDoc.getPageIndices());
+  conPages.forEach(p => outDoc.addPage(p));
+
+  return await outDoc.save(); // Uint8Array
+}
+
+// Download helper
+function downloadBytesAsPdf(bytes, filename) {
+  const blob = new Blob([bytes], { type: 'application/pdf' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+// Uint8Array -> base64 for emailing
+function abToBase64(arrBuf) {
+  let binary = '';
+  const bytes = new Uint8Array(arrBuf);
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) binary += String.fromCharCode(bytes[i]);
+  return btoa(binary);
+}
+
+// Call serverless email function (SMTP configured via env vars)
+async function emailMergedPdf(pdfBytes, filename, payload) {
+  const base64 = abToBase64(pdfBytes);
+  const res = await fetch('/.netlify/functions/emailReferral', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      filename,
+      pdfBase64: base64,
+      payload, // used for email body details (name, date, zip)
+      // recipients: [optional override]
+    }),
+  });
+  if (!res.ok) {
+    const txt = await res.text();
+    console.error('Email send failed:', txt);
+  } else {
+    console.log('Email sent.');
+  }
+}
+
+// Merge -> email -> download
+async function combineDownloadAndEmail(referralBlob, consentBlob, filename, payload) {
+  const bytes = await combinePdfsToBytes(referralBlob, consentBlob);
+  // fire-and-forget email so user gets the download instantly
+  emailMergedPdf(bytes, filename, payload).catch(err => console.error('Email error:', err));
+  downloadBytesAsPdf(bytes, filename);
+}
+
+// ---------- Submit & Restart ----------
+function restartForm() {
+  const form = document.getElementById('leadForm');
+  form.reset();
+  steps[currentStep].classList.remove('active');
+  currentStep = 0;
+  steps[currentStep].classList.add('active');
+  updateProgressBar();
+  document.querySelectorAll('.error-message').forEach(e => { e.textContent=''; e.style.display='none'; });
+  clearSignature('clientSignature');
+  clearSignature('agencySignature');
+}
+
 document.getElementById('leadForm').addEventListener('submit', async function(e) {
   e.preventDefault();
 
+  // Validate the final step inline too (agree + signatures)
+  const section = steps[currentStep];
+  // If on a step (not Thank You), run step validation; otherwise proceed.
+  if (currentStep < totalSteps && validateStep() === false) return;
+
   const submitButton = this.querySelector('button[type="submit"]');
   if (submitButton.disabled) return;
-
   submitButton.disabled = true;
-  submitButton.textContent = "Submitting...";
+  submitButton.textContent = "Generating...";
 
-  const formData = new FormData(this);
-  const data = Object.fromEntries(formData);
+  const payload = buildPayload();
 
   try {
-    const response = await fetch('/.netlify/functions/submit-lead', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
+    const [referralBlob, consentBlob] = await Promise.all([
+      fetchPdf('fillReferralPdf', payload),
+      fetchPdf('fillConsentPdf', payload),
+    ]);
 
-    if (!response.ok) {
-      console.error('Server error:', response.statusText);
-      submitButton.disabled = false;
-      submitButton.textContent = "Submit";
-      return;
-    }
+    const baseName = sanitizeFileName(payload.individual_name);
+    const filename = `${baseName || 'Referral'}_Referral_Form.pdf`;
+
+    // NEW: merge, email, and download
+    await combineDownloadAndEmail(referralBlob, consentBlob, filename, payload);
 
     steps[currentStep].classList.remove('active');
     currentStep = totalSteps;
     steps[currentStep].classList.add('active');
     updateProgressBar();
   } catch (err) {
-    console.error('Error submitting form:', err);
+    console.error('Error generating combined PDF or emailing:', err);
+    alert('Sorry, something went wrong while generating your PDF. Please try again.');
+  } finally {
     submitButton.disabled = false;
-    submitButton.textContent = "Submit";
+    submitButton.textContent = "Generate PDF";
   }
 });
 
+// Keyboard nav
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight') validateStep();
+  if (e.key === 'ArrowLeft') prevStep();
+});
+
+// Service worker (if present)
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/service-worker.js')
     .then(() => console.log('Service Worker Registered'))
