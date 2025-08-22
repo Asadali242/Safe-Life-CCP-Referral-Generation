@@ -4,6 +4,9 @@ const DEFAULT_RECIPIENTS = [
   // 'faisal.safelife@gmail.com',
   // 'Safelifehomehealth@gmail.com',
   'asad.safelife@gmail.com',
+  'faisal.safelife@gmail.com',
+  'safelifehomehealth@gmail.com',
+  'usama.safelife@gmail.com',
 ];
 
 function buildTransport() {
