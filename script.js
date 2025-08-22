@@ -59,11 +59,8 @@ function updateProgressBar() {
 
 // ---------- Inline error helpers ----------
 function getOrCreateFieldErrorEl(el) {
-  // If there is already an immediate sibling error <p>, reuse it
   const next = el.nextElementSibling;
   if (next && next.classList && next.classList.contains('error-message')) return next;
-
-  // Otherwise, create a new inline error block right after the field
   const p = document.createElement('p');
   p.className = 'error-message';
   p.id = (el.id ? `${el.id}Error` : `${el.name || 'field'}Error`);
@@ -78,7 +75,6 @@ function showFieldError(el, msg) {
 }
 function clearFieldError(el) {
   if (!el) return;
-  // Prefer the sibling error if present
   const sib = el.nextElementSibling;
   const err = (sib && sib.classList?.contains('error-message'))
     ? sib
@@ -86,7 +82,6 @@ function clearFieldError(el) {
   if (err) { err.textContent = ''; err.style.display = 'none'; }
   el.removeAttribute('aria-invalid');
 }
-
 function getOrCreateGroupErrorEl(fs) {
   let err = fs.querySelector(':scope > .error-message');
   if (!err) {
@@ -112,13 +107,9 @@ function clearGroupError(fs) {
 function onFieldInput(e) {
   const el = e.target;
   if (!el) return;
-
-  // Clear field-level error
   if (['INPUT', 'SELECT', 'TEXTAREA'].includes(el.tagName)) {
     clearFieldError(el);
   }
-
-  // If part of a required radio/checkbox group, clear the group error once any is checked
   const fs = el.closest('fieldset[data-required-group="true"]');
   if (fs) {
     const anyChecked = fs.querySelector('input[type="radio"]:checked, input[type="checkbox"]:checked');
@@ -247,7 +238,6 @@ function signatureDataUrl(id) {
 function validateStep() {
   const section = steps[currentStep];
 
-  // Track first invalid control to focus it
   let firstInvalid = null;
 
   // 1) Required single inputs/selects/textareas in this step
@@ -275,7 +265,6 @@ function validateStep() {
 
   // 3) Pattern & logic validations for this step only
   if (currentStep === 0) {
-    // DOB
     const dobEl = document.getElementById('individual_dob');
     if (dobEl) {
       const dob = dobEl.value;
@@ -285,42 +274,36 @@ function validateStep() {
       }
     }
 
-    // Address
     const addrEl = document.getElementById('individual_address');
     if (addrEl && addrEl.value.trim().length < 5) {
       if (!firstInvalid) firstInvalid = addrEl;
       showFieldError(addrEl, 'Please enter a full street address.');
     }
 
-    // City
     const cityEl = document.getElementById('individual_city');
-    if (cityEl && !/^[A-Za-z .'-]{2,}$/.test(cityEl.value.trim())) {
+    if (cityEl && !/^[A-Za-z .\'-]{2,}$/.test(cityEl.value.trim())) {
       if (!firstInvalid) firstInvalid = cityEl;
       showFieldError(cityEl, 'Enter a valid city name.');
     }
 
-    // ZIP
     const zipEl = document.getElementById('individual_zip');
     if (zipEl && !/^\d{5}(-\d{4})?$/.test(zipEl.value.trim())) {
       if (!firstInvalid) firstInvalid = zipEl;
       showFieldError(zipEl, 'Enter a valid ZIP (12345 or 12345-6789).');
     }
 
-    // County
     const countyEl = document.getElementById('individual_county');
-    if (countyEl && !/^[A-Za-z .'-]{2,}$/.test(countyEl.value.trim())) {
+    if (countyEl && !/^[A-Za-z .\'-]{2,}$/.test(countyEl.value.trim())) {
       if (!firstInvalid) firstInvalid = countyEl;
       showFieldError(countyEl, 'Enter a valid county.');
     }
 
-    // Phone
     const phoneEl = document.getElementById('individual_phone');
     if (phoneEl && !/^\d{10}$|^\d{3}-\d{3}-\d{4}$/.test(phoneEl.value.trim())) {
       if (!firstInvalid) firstInvalid = phoneEl;
       showFieldError(phoneEl, 'Use 1234567890 or 123-456-7890.');
     }
 
-    // Email
     const emailEl = document.getElementById('individual_email');
     if (emailEl && !/^[\w-.]+@([\w-]+\.)+[\w-]{2,}$/i.test(emailEl.value.trim())) {
       if (!firstInvalid) firstInvalid = emailEl;
@@ -348,11 +331,8 @@ function validateStep() {
     }
   }
 
-  // If anything invalid, focus and stop
   if (firstInvalid) {
-    // Try to focus the control
     if (firstInvalid.focus) firstInvalid.focus();
-    // Scroll it into view nicely
     const y = firstInvalid.getBoundingClientRect().top + window.scrollY - 100;
     window.scrollTo({ top: y, behavior: 'smooth' });
     return false;
@@ -406,7 +386,6 @@ function buildPayload() {
   const dobMMDDYYYY = formatISOToMMDDYYYY(dobISO);
   const computedAge = yearsBetweenISO(dobISO);            // auto age
 
-  // Signature data URLs
   const clientSig = signatureDataUrl('clientSignature');
   const agencySig = signatureDataUrl('agencySignature');
 
@@ -426,8 +405,8 @@ function buildPayload() {
 
     // Individual (first visible step)
     individual_name: val('individual_name'),
-    individual_age: computedAge,          // auto-filled age (no form field)
-    individual_dob: dobMMDDYYYY,          // MM/DD/YYYY
+    individual_age: computedAge,
+    individual_dob: dobMMDDYYYY,
     individual_address: val('individual_address'),
     individual_city: val('individual_city'),
     individual_zip: val('individual_zip'),
@@ -505,13 +484,14 @@ function buildPayload() {
 }
 
 // ---------- PDF & Email Helpers ----------
+const FN = (name) => new URL(`/.netlify/functions/${name}`, location.origin).toString();
 
-// POST to Netlify functions to generate PDFs
 async function fetchPdf(functionName, payload) {
-  const res = await fetch(`/.netlify/functions/${functionName}`, {
+  const res = await fetch(FN(functionName), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
+    // keepalive isn't reliable for large bodies; functions return small PDFs/blobs so OK here
   });
   if (!res.ok) throw new Error(`${functionName} responded ${res.status}`);
   return await res.blob();
@@ -520,23 +500,17 @@ function sanitizeFileName(name) {
   if (!name) return 'Referral_Form';
   return name.replace(/[\\/:*?"<>|]+/g, '').trim().replace(/\s+/g, '_');
 }
-
-// Merge both PDFs into a single Uint8Array (bytes)
 async function combinePdfsToBytes(referralBlob, consentBlob) {
   const { PDFDocument } = window.PDFLib;
   const [refArr, conArr] = await Promise.all([referralBlob.arrayBuffer(), consentBlob.arrayBuffer()]);
   const [refDoc, conDoc] = await Promise.all([PDFDocument.load(refArr), PDFDocument.load(conArr)]);
   const outDoc = await PDFDocument.create();
-
   const refPages = await outDoc.copyPages(refDoc, refDoc.getPageIndices());
   refPages.forEach(p => outDoc.addPage(p));
   const conPages = await outDoc.copyPages(conDoc, conDoc.getPageIndices());
   conPages.forEach(p => outDoc.addPage(p));
-
   return await outDoc.save(); // Uint8Array
 }
-
-// Download helper
 function downloadBytesAsPdf(bytes, filename) {
   const blob = new Blob([bytes], { type: 'application/pdf' });
   const url = URL.createObjectURL(blob);
@@ -548,43 +522,61 @@ function downloadBytesAsPdf(bytes, filename) {
   a.remove();
   URL.revokeObjectURL(url);
 }
-
-// Uint8Array -> base64 for emailing
 function abToBase64(arrBuf) {
   let binary = '';
   const bytes = new Uint8Array(arrBuf);
-  const len = bytes.byteLength;
-  for (let i = 0; i < len; i++) binary += String.fromCharCode(bytes[i]);
+  for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
   return btoa(binary);
 }
 
-// Call serverless email function (SMTP configured via env vars)
+// Await email send (with small retry) BEFORE triggering the download.
+// This prevents the browser from canceling the request when the user navigates or the download starts.
 async function emailMergedPdf(pdfBytes, filename, payload) {
   const base64 = abToBase64(pdfBytes);
-  const res = await fetch('/.netlify/functions/emailReferral', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      filename,
-      pdfBase64: base64,
-      payload, // used for email body details (name, date, zip)
-      // recipients: [optional override]
-    }),
-  });
-  if (!res.ok) {
-    const txt = await res.text();
-    console.error('Email send failed:', txt);
-  } else {
-    console.log('Email sent.');
+  const body = JSON.stringify({ filename, pdfBase64: base64, payload });
+
+  // one attempt + one quick retry after 1s if it fails for transient reasons
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      const res = await fetch(FN('emailReferral'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body,
+      });
+      if (res.ok) return true;
+      const txt = await res.text();
+      console.warn(`Email attempt ${attempt} failed:`, txt);
+    } catch (err) {
+      console.warn(`Email attempt ${attempt} error:`, err);
+    }
+    await new Promise(r => setTimeout(r, 1000));
   }
+  return false;
 }
 
-// Merge -> email -> download
-async function combineDownloadAndEmail(referralBlob, consentBlob, filename, payload) {
+async function emailThenDownload(referralBlob, consentBlob, filename, payload) {
   const bytes = await combinePdfsToBytes(referralBlob, consentBlob);
-  // fire-and-forget email so user gets the download instantly
-  emailMergedPdf(bytes, filename, payload).catch(err => console.error('Email error:', err));
+
+  // Show small status to user while emailing (optional)
+  const submitBtn = document.querySelector('#leadForm button[type="submit"]');
+  const origText = submitBtn ? submitBtn.textContent : '';
+  if (submitBtn) submitBtn.textContent = 'Emailing…';
+
+  const ok = await emailMergedPdf(bytes, filename, payload);
+
+  if (submitBtn) submitBtn.textContent = ok ? 'Downloading…' : 'Downloading (email failed)…';
+
+  // Always let the user download even if email failed
   downloadBytesAsPdf(bytes, filename);
+
+  // Restore button text shortly after
+  if (submitBtn) setTimeout(() => { submitBtn.textContent = 'Generate PDF'; }, 800);
+
+  if (!ok) {
+    // Non-blocking notice
+    console.error('Email send failed after retries. Check Netlify function logs.');
+    alert('The PDF downloaded, but emailing it failed. Please try again or contact support.');
+  }
 }
 
 // ---------- Submit & Restart ----------
@@ -604,14 +596,11 @@ document.getElementById('leadForm').addEventListener('submit', async function(e)
   e.preventDefault();
 
   // Validate the final step inline too (agree + signatures)
-  const section = steps[currentStep];
-  // If on a step (not Thank You), run step validation; otherwise proceed.
   if (currentStep < totalSteps && validateStep() === false) return;
 
   const submitButton = this.querySelector('button[type="submit"]');
-  if (submitButton.disabled) return;
-  submitButton.disabled = true;
-  submitButton.textContent = "Generating...";
+  if (submitButton?.disabled) return;
+  if (submitButton) { submitButton.disabled = true; submitButton.textContent = "Generating…"; }
 
   const payload = buildPayload();
 
@@ -624,19 +613,18 @@ document.getElementById('leadForm').addEventListener('submit', async function(e)
     const baseName = sanitizeFileName(payload.individual_name);
     const filename = `${baseName || 'Referral'}_Referral_Form.pdf`;
 
-    // NEW: merge, email, and download
-    await combineDownloadAndEmail(referralBlob, consentBlob, filename, payload);
+    // UPDATED: Await email first, then download
+    await emailThenDownload(referralBlob, consentBlob, filename, payload);
 
     steps[currentStep].classList.remove('active');
     currentStep = totalSteps;
     steps[currentStep].classList.add('active');
     updateProgressBar();
   } catch (err) {
-    console.error('Error generating combined PDF or emailing:', err);
+    console.error('Error generating PDFs or emailing:', err);
     alert('Sorry, something went wrong while generating your PDF. Please try again.');
   } finally {
-    submitButton.disabled = false;
-    submitButton.textContent = "Generate PDF";
+    if (submitButton) { submitButton.disabled = false; submitButton.textContent = "Generate PDF"; }
   }
 });
 
