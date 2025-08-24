@@ -191,7 +191,6 @@ button.back-btn:hover,
   color: #004a68;            /* brand deep teal */
   margin-bottom: 6px;
 }
-
 @media (max-width: 480px) {
   .critical-question { font-size: 1.15rem; }
 }
@@ -206,18 +205,38 @@ button.back-btn:hover,
   margin: 10px 0 6px;
 }
 
-/* Yes/No/Unknown (horizontal) */
-.inline-fieldset > label {
-  display: inline-flex;
+/* --- Radio groups: equal-width cells, centered, mobile-safe --- */
+.inline-fieldset {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 10px 16px;
   align-items: center;
-  gap: 6px;
-  margin-right: 24px;
-  margin-bottom: 0;
-  vertical-align: middle;
+  padding: 10px 12px;        /* keeps content off the border */
+  overflow: hidden;          /* prevents tiny overflows on iOS */
+  border-radius: 8px;
+}
+.inline-fieldset legend {
+  grid-column: 1 / -1;       /* legend spans full row */
+  margin: 0 0 6px;
+}
+.inline-fieldset > label {
+  display: flex;             /* radio + text on one row */
+  align-items: center;
+  justify-content: center;   /* center each option cell */
+  gap: 8px;
+  margin: 0;
+  min-width: 0;              /* allow shrinking without overflow */
+  white-space: nowrap;       /* keep “Unknown” on one line */
 }
 .inline-fieldset input[type="radio"] {
+  flex: 0 0 auto;
   margin: 0;
-  transform: translateY(1px);
+  transform: none;           /* avoid odd vertical offsets on iOS */
+}
+/* Inline error inside the fieldset spans across */
+.inline-fieldset > .error-message {
+  grid-column: 1 / -1;
+  margin-top: -4px;
 }
 
 /* Facility (multi-checkbox) — one option per line, checkbox right-aligned */
@@ -328,6 +347,10 @@ button.back-btn:hover,
 /* ========== Responsive ========== */
 @media (max-width: 540px) {
   .container { padding: 28px; }
-  .inline-fieldset > label { margin-right: 16px; }
-  .checkbox-fieldset .option-text { padding-right: 10px; }
+}
+@media (max-width: 380px) {
+  /* if three radio options don't fit, gracefully wrap to two columns */
+  .inline-fieldset {
+    grid-template-columns: repeat(2, minmax(110px, 1fr));
+  }
 }
