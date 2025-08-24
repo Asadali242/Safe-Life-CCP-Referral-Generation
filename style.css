@@ -205,35 +205,37 @@ button.back-btn:hover,
   margin: 10px 0 6px;
 }
 
-/* --- Radio groups: equal-width cells, centered, mobile-safe --- */
+/* --- Radio groups: tight, mobile-safe, left-aligned --- */
 .inline-fieldset {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-  gap: 10px 16px;
+  grid-template-columns: repeat(3, 1fr);   /* three equal columns */
+  column-gap: 8px;
+  row-gap: 8px;
   align-items: center;
-  padding: 10px 12px;        /* keeps content off the border */
-  overflow: hidden;          /* prevents tiny overflows on iOS */
+  padding: 10px 12px;
+  overflow: hidden;
   border-radius: 8px;
 }
 .inline-fieldset legend {
-  grid-column: 1 / -1;       /* legend spans full row */
+  grid-column: 1 / -1;
   margin: 0 0 6px;
 }
 .inline-fieldset > label {
-  display: flex;             /* radio + text on one row */
+  display: inline-flex;                     /* radio + text on one row */
   align-items: center;
-  justify-content: center;   /* center each option cell */
-  gap: 8px;
+  justify-content: flex-start;              /* keep radio close to text */
+  gap: 4px;                                 /* <<< reduced gap */
   margin: 0;
-  min-width: 0;              /* allow shrinking without overflow */
-  white-space: nowrap;       /* keep “Unknown” on one line */
+  min-width: 0;
+  white-space: nowrap;                      /* keep “Unknown” on one line */
 }
 .inline-fieldset input[type="radio"] {
   flex: 0 0 auto;
+  width: 18px; height: 18px;                /* consistent size */
   margin: 0;
-  transform: none;           /* avoid odd vertical offsets on iOS */
+  transform: none;                          /* avoid iOS vertical offset */
 }
-/* Inline error inside the fieldset spans across */
+/* Inline error spans across the whole group */
 .inline-fieldset > .error-message {
   grid-column: 1 / -1;
   margin-top: -4px;
@@ -348,9 +350,7 @@ button.back-btn:hover,
 @media (max-width: 540px) {
   .container { padding: 28px; }
 }
-@media (max-width: 380px) {
-  /* if three radio options don't fit, gracefully wrap to two columns */
-  .inline-fieldset {
-    grid-template-columns: repeat(2, minmax(110px, 1fr));
-  }
+/* If three options are too tight on very narrow devices, wrap to two columns. */
+@media (max-width: 360px) {
+  .inline-fieldset { grid-template-columns: repeat(2, 1fr); }
 }
