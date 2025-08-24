@@ -7,7 +7,6 @@ html, body {
   padding: 0;
   overflow-x: hidden;
 }
-
 body {
   display: flex;
   flex-direction: column;
@@ -17,17 +16,13 @@ body {
   font-family: 'Montserrat', sans-serif;
 }
 
+/* Normalize fieldset/legend across Safari/iPad */
+fieldset { min-width: 0; margin: 0; }
+legend  { max-width: 100%; }
+
 /* ========== Header & Branding ========== */
-.page-header {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  margin-bottom: 40px;
-}
-.page-header .logo {
-  height: 150px;
-  width: auto;
-}
+.page-header { position: absolute; top: 20px; left: 20px; margin-bottom: 40px; }
+.page-header .logo { height: 150px; width: auto; }
 
 /* ========== Tagline ========== */
 .quote-container {
@@ -72,7 +67,7 @@ body {
 /* ========== Progress Bar ========== */
 .progress-container {
   width: 100%;
-  background: #e6eeef; /* Blue Mist */
+  background: #e6eeef;
   border-radius: 8px;
   overflow: hidden;
   height: 12px;
@@ -85,20 +80,10 @@ body {
   border-radius: 8px;
   transition: width 0.4s ease-in-out;
 }
-.step-indicator {
-  font-size: 1rem;
-  color: #004a68;
-  font-weight: 600;
-  margin-bottom: 20px;
-}
+.step-indicator { font-size: 1rem; color: #004a68; font-weight: 600; margin-bottom: 20px; }
 
 /* ========== Headings & Labels ========== */
-h2 {
-  font-size: 2rem;
-  margin-bottom: 20px;
-  color: #004a68;
-  font-weight: 800;
-}
+h2 { font-size: 2rem; margin-bottom: 20px; color: #004a68; font-weight: 800; }
 .section-title { margin: 0 0 6px; color: #004a68; font-size: 1.1rem; }
 .section-note  { margin: 0 0 12px; color: #4e6b78; font-size: 0.95rem; }
 
@@ -113,10 +98,7 @@ label {
 
 /* ========== Steps ========== */
 .step { display: none; }
-.step.active {
-  display: block;
-  animation: fadeIn 0.3s ease-in-out;
-}
+.step.active { display: block; animation: fadeIn 0.3s ease-in-out; }
 
 /* ========== Validation UI ========== */
 .required-label { font-size: 0.85rem; color: #2BA84A; font-weight: 700; }
@@ -154,16 +136,10 @@ button {
   transition: background 0.3s ease;
 }
 button:hover { background-color: #00364e; }
+.button-group { display: flex; justify-content: space-between; margin-top: 20px; }
 
-.button-group {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-}
-
-button.back-btn,
-.restart-btn {
-  background-color: #3cafaa; /* Aqua brand color */
+button.back-btn, .restart-btn {
+  background-color: #3cafaa;
   color: #fff;
   border: none;
   padding: 12px 20px;
@@ -173,73 +149,65 @@ button.back-btn,
   cursor: pointer;
   transition: background 0.3s ease;
 }
-button.back-btn:hover,
-.restart-btn:hover { background-color: #2c8a8a; }
+button.back-btn:hover, .restart-btn:hover { background-color: #2c8a8a; }
 
 /* ========== Thank You Step ========== */
-#thankYouStep h3 {
-  color: #599f76;
-  font-size: 1.6rem;
-  margin-top: 20px;
-  font-weight: 700;
-}
+#thankYouStep h3 { color: #599f76; font-size: 1.6rem; margin-top: 20px; font-weight: 700; }
 
 /* ========== Important Question ========= */
-.critical-question {
-  font-weight: 800;          /* bold */
-  font-size: 1.25rem;        /* larger than normal labels */
-  color: #004a68;            /* brand deep teal */
-  margin-bottom: 6px;
-}
-@media (max-width: 480px) {
-  .critical-question { font-size: 1.15rem; }
-}
+.critical-question { font-weight: 800; font-size: 1.25rem; color: #004a68; margin-bottom: 6px; }
+@media (max-width: 480px) { .critical-question { font-size: 1.15rem; } }
 
 /* ========== Selection Questions ========== */
 /* Legend (question) */
 .inline-fieldset legend,
 .checkbox-fieldset legend {
   display: block;
+  width: 100%;
+  text-align: center;           /* keep centered on iPad */
   font-weight: 700;
   color: #004a68;
-  margin: 10px 0 6px;
+  margin: 0 0 8px;
+  padding: 0 8px;               /* prevent legend text from hanging outside border */
+  box-sizing: border-box;
 }
 
-/* --- Radio groups: tight, mobile-safe, left-aligned --- */
+/* Fieldset box and padding tuned for Safari/iPad */
 .inline-fieldset {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);   /* three equal columns */
+  grid-template-columns: repeat(3, 1fr);   /* Yes / No / Unknown */
   column-gap: 8px;
   row-gap: 8px;
   align-items: center;
-  padding: 10px 12px;
-  overflow: hidden;
+  /* Ensure padding works across WebKit */
+  padding: 12px;
+  -webkit-padding-before: 12px;
+  -webkit-padding-after: 12px;
+  -webkit-padding-start: 12px;
+  -webkit-padding-end: 12px;
+  border: 1px solid #cfdde2;    /* subtle box to match PDF style */
   border-radius: 8px;
+  overflow: hidden;              /* avoid tiny negative overflow on iPad */
 }
-.inline-fieldset legend {
-  grid-column: 1 / -1;
-  margin: 0 0 6px;
-}
+
+/* Option cells: keep radio tight to text and left-aligned */
 .inline-fieldset > label {
-  display: inline-flex;                     /* radio + text on one row */
+  display: inline-flex;
   align-items: center;
-  justify-content: flex-start;              /* keep radio close to text */
-  gap: 4px;                                 /* <<< reduced gap */
+  justify-content: flex-start;
+  gap: 4px;                      /* tight gap to eliminate big spacing */
   margin: 0;
   min-width: 0;
-  white-space: nowrap;                      /* keep “Unknown” on one line */
+  white-space: nowrap;
 }
 .inline-fieldset input[type="radio"] {
   flex: 0 0 auto;
-  width: 18px; height: 18px;                /* consistent size */
+  width: 18px; height: 18px;
   margin: 0;
-  transform: none;                          /* avoid iOS vertical offset */
+  transform: none;               /* fixes vertical offset in iOS */
 }
-/* Inline error spans across the whole group */
-.inline-fieldset > .error-message {
-  grid-column: 1 / -1;
-  margin-top: -4px;
-}
+/* Group error spans across */
+.inline-fieldset > .error-message { grid-column: 1 / -1; margin-top: -2px; }
 
 /* Facility (multi-checkbox) — one option per line, checkbox right-aligned */
 .checkbox-fieldset .options--onecol {
@@ -265,8 +233,7 @@ button.back-btn:hover,
 .checkbox-fieldset .option input[type="checkbox"] {
   justify-self: end;
   align-self: center;
-  width: 18px;
-  height: 18px;
+  width: 18px; height: 18px;
   margin: 0;
   transform: translateY(1px);
 }
@@ -291,25 +258,33 @@ button.back-btn:hover,
   text-align: left;
   color: #0d4052;
   font-size: 0.98rem;
+  box-sizing: border-box;
 }
+
+/* Authorization checkbox + long statement: keep text beside checkbox and wrap */
 .agree-line {
-  display: inline-flex;
+  display: grid;
+  grid-template-columns: 22px 1fr; /* checkbox | text */
+  align-items: flex-start;
   gap: 10px;
-  align-items: center;
   margin: 12px 0 6px;
   color: #004a68;
   font-weight: 600;
-}
-.sig-section {
   text-align: left;
-  margin-top: 10px;
 }
+.agree-line input[type="checkbox"] {
+  width: 18px; height: 18px;
+  margin-top: 2px;              /* visually center with first line of text */
+}
+.agree-line .agree-text {
+  min-width: 0;                 /* allow wrapping within container */
+  white-space: normal;
+  line-height: 1.35;
+}
+
+.sig-section { text-align: left; margin-top: 10px; }
 .sig-block { margin-bottom: 16px; }
-.sig-label {
-  margin-bottom: 6px;
-  color: #004a68;
-  font-weight: 700;
-}
+.sig-label { margin-bottom: 6px; color: #004a68; font-weight: 700; }
 .signature-pad {
   background: #fff;
   border: 2px dashed #8fcad0;
@@ -324,11 +299,7 @@ button.back-btn:hover,
   border-radius: 6px;
   cursor: crosshair;
 }
-.sig-tools {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 8px;
-}
+.sig-tools { display: flex; justify-content: flex-end; margin-top: 8px; }
 .sig-clear {
   background: #3cafaa;
   color: #fff;
@@ -350,7 +321,14 @@ button.back-btn:hover,
 @media (max-width: 540px) {
   .container { padding: 28px; }
 }
-/* If three options are too tight on very narrow devices, wrap to two columns. */
+
+/* Very narrow phones: fall back to 2 columns for radios */
 @media (max-width: 360px) {
   .inline-fieldset { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* iPad-specific polish (landscape/portrait widths) */
+@media (min-width: 700px) and (max-width: 1024px) {
+  .inline-fieldset { grid-template-columns: repeat(3, minmax(120px, 1fr)); }
+  .inline-fieldset legend { padding: 0 10px; }
 }
